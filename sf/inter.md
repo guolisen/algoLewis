@@ -242,3 +242,297 @@ public:
     }
 };
 ```
+
+# 460 · Find K Closest Elements
+
+k个最接近目标值的数
+
+```
+class Solution {
+public:
+     bool isLeftClosest(vector<int> &a, int target, int l, int r)
+     {
+        if (l < 0)
+            return false;
+        if (r >= a.size())
+            return true;
+        if (target - a[l] <= a[r] - target)
+            return true;
+        return false;  
+     }
+    vector<int> kClosestNumbers(vector<int> &a, int target, int k) {
+        vector<int> res;
+        int l = 0;
+        int r = a.size() - 1;
+        while (l < r)
+        {
+            int mid = (l + r) / 2;
+            if (a[mid] >= target)
+            {
+                r = mid;
+            }
+            else
+            {
+                l = mid + 1;
+            }
+        }
+        int left  = l - 1;
+        int right = l;
+        while (k--)
+        {
+            if (isLeftClosest(a, target, left, right))
+            {
+                res.push_back(a[left--]);
+            }
+            else
+            {
+                res.push_back(a[right++]);
+            }
+        }
+        return res;
+    }
+};
+```
+# 62 · Search in Rotated Sorted Array
+想象成一个菱形，如果是上半部分，就判断是上坡，还是下坡，最后决定是r = mid或l = mid + 1
+
+和左端点比较，确定是上半部还是下半部，判断坡度，确定是上升还是下降
+
+```
+class Solution {
+public:
+    bool check(vector<int> &A, int mid, int l, int r, int target)
+    {
+        int m = A.size();
+        if (A[l] <= A[mid])
+        {
+            if (A[l] <= target && target <= A[mid])
+            {
+                return true;
+            }
+            else
+                return false;
+        }
+        else
+        {
+            if (A[mid] <= target && target <= A[r])
+            {
+                return false;
+            }
+            else
+                return true;
+        }
+    }
+    int search(vector<int> &A, int target) {
+        if (A.empty())
+            return -1;
+        int m = A.size();
+        int l = 0;
+        int r = m - 1;
+        while (l < r)
+        {
+            int mid = (l + r) / 2;
+            if(check(A, mid, l, r, target))
+            {
+                r = mid;
+                if (A[mid] == target)
+                    return mid;
+            }
+            else
+            {
+                l = mid + 1;
+                if (A[mid] == target)
+                    return mid;
+            }
+        }
+        if (A[l] != target)
+            return -1;
+        return l;
+    }
+};
+```
+
+# 585 · Maximum Number in Mountain Sequence
+
+```
+class Solution {
+public:
+    bool check(vector<int> &nums, int mid)
+    {
+        int m = nums.size();
+        if ((mid - 1 >= 0 && nums[mid - 1] > nums[mid]) || 
+            (mid + 1 < m && nums[mid] > nums[mid + 1]))
+        {
+            return true;
+        }
+        return false;
+    }
+    int mountainSequence(vector<int> &nums) {
+        int m = nums.size();
+        int l = 0;
+        int r = m - 1;
+        while (l < r)
+        {
+            int mid = (l + r) / 2;
+            if (check(nums, mid))
+            {
+                r = mid;
+            }
+            else
+            {
+                l = mid + 1;
+            }
+        }
+        return nums[l];
+    }
+};
+```
+
+# 137 · Clone Graph
+
+1. 建立原始节点和新clone节点的map结构
+2. 每次只处理当前节点和子节点，只将当前节点的子节点，加入到当前节点的clone节点中（当前节点 -> 子节点, 不处理 子节点->当前节点）
+
+```
+/**
+ * Definition for undirected graph.
+ * struct UndirectedGraphNode {
+ *     int label;
+ *     vector<UndirectedGraphNode *> neighbors;
+ *     UndirectedGraphNode(int x) : label(x) {};
+ * };
+ */
+
+class Solution {
+public:
+    UndirectedGraphNode* cloneGraph(UndirectedGraphNode *node) {
+        if(!node)
+            return nullptr;
+        unordered_map<UndirectedGraphNode *, UndirectedGraphNode *> mclone;
+
+        UndirectedGraphNode* croot = new UndirectedGraphNode(node->label);
+        mclone[node] = croot;
+        queue<UndirectedGraphNode *> q;
+        q.push(node);
+
+        while (!q.empty())
+        {
+            auto cur = q.front(); q.pop();
+            for (auto n : cur->neighbors)
+            {
+                auto it = mclone.find(n);
+                if (it != mclone.end())
+                {
+                    mclone[cur]->neighbors.push_back(it->second);
+                }
+                else
+                {
+                    auto newNode = new UndirectedGraphNode(n->label);
+                    mclone[cur]->neighbors.push_back(newNode);
+                    mclone[n] = newNode;
+                    q.push(n);
+                }
+            }
+        }
+        return croot;
+
+    }
+};
+```
+
+# 120 · Word Ladder
+
+方法1：将cur和dict里面的单词比较，只差一个字母的入队，宽搜
+
+方法2： cur单词的每个位置用26字母替换，然后看是否在dict，且没有visit，如果是，入队
+
+```
+class Solution {
+public:
+    int ladderLength(string &start, string &end, unordered_set<string> &dict) {
+        dict.insert(end);
+        queue<string> q;
+        unordered_set<string> visit;
+
+        q.push(start);
+        int step = 0;
+        while(!q.empty())
+        {
+            int levelnum = q.size();
+            while (levelnum--)
+            {
+                auto cur = q.front(); q.pop();
+                if(cur == end)
+                    return step + 1;
+                int len = cur.size();
+                for (int i = 0; i < len; i++)
+                {
+                    string ts = cur;
+                    for (int j = 0; j < 26; j++)
+                    {
+                        if(ts[i] == 'a' + j)
+                            continue;
+                        ts[i] = 'a' + j;
+                        if (!dict.count(ts) || visit.count(ts))
+                            continue;
+                        q.push(ts);
+                        visit.insert(ts);
+                    }
+                }
+            }
+            step++;
+        }
+    }
+};
+```
+
+# 178 · Graph Valid Tree （树 验证）
+
+判断树的三个条件
+
+1. 联通性
+
+2. 边数 = 节点数 - 1
+
+3. 是否有环
+
+```
+class Solution {
+public:
+    map<int, int> p;
+    int find(int x)
+    {
+        if (p[x] != x) p[x] = find(p[x]);
+        return p[x];
+    }
+    bool validTree(int n, vector<vector<int>> &edges) {
+        if (edges.empty())
+            return n == 1? true:false;
+        for (int i = 0; i< n; i++)
+        {
+            p[i] = i;
+        }
+
+        for (auto n : edges)
+        {
+            if (find(n[0]) == find(n[1]))
+            {
+                return false;
+            }
+
+            p[find(n[0])] = find(n[1]);
+        }
+
+        std::set<int> res;
+        for (int i = 0; i< n; i++)
+        {
+            res.insert(find(i));
+        }
+        if (res.size() != 1)
+            return false;
+
+        return true;
+    }
+};
+```
+
