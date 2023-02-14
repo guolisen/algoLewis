@@ -2,7 +2,10 @@
 
 
 
-# 57 · 三数之和
+# 57 · 三数之和（双指针，固定一个，动另外两个）
+
+固定一个，动另外两个
+
 ```
 class Solution {
 public:
@@ -17,7 +20,6 @@ public:
             while (l < r)
             {
                 int sum = n[l] + n[r] + n[i];
-                //cout << n[i] << " " << n[l] << " " << n[r] << " " << sum << endl;
                 if (sum == 0)
                 {
                     res.insert({n[i], n[l], n[r]});
@@ -38,7 +40,7 @@ public:
     }
 };
 ```
-# 667 · 最长的回文序列
+# 667 · 最长的回文序列（区间DP）
 区间dp
 ```
 class Solution {
@@ -69,48 +71,11 @@ public:
     }
 };
 ```
-# 594 · 字符串查找 II
-```
-class Solution {
-public:
-    typedef unsigned long long ULL;
 
-    ULL getHash(vector<ULL>& h, vector<ULL>& p, int L, int R)
-    {
-        return h[R] - h[L - 1] * p[R - (L - 1)];
-    }
-    int strStr2(string &source, string &target) {
-        int m = source.size();
-        int n = target.size();
+# 200 · 最长回文子串（区间 DP，从里往外算）
 
-        vector<ULL> shash(m + 1, 0);
-        vector<ULL> thash(n + 1, 0);
-        vector<ULL> p(m + 1, 0);
-        int P = 31;
+区间 DP，从里往外算
 
-        p[0] = 1;
-        for (int i = 1; i <= m; i++)
-        {
-            p[i] = p[i - 1] * P;
-            shash[i] = shash[i - 1] * P + source[i - 1];
-        }
-
-        for (int i = 1; i <= n; i++)
-        {
-            thash[i] = thash[i - 1] * P + target[i - 1];
-        }
-
-        for (int i = 1; i + n - 1 <= m; i++)
-        {
-            ULL hh = getHash(shash, p, i, i + n - 1);
-            if (hh == thash[n])
-                return i - 1;
-        }
-        return -1;
-    }
-};
-```
-# 200 · 最长回文子串
 ```
 class Solution {
 public:
@@ -149,8 +114,49 @@ public:
     }
 };
 ```
+# 594 · 字符串查找 II（字符串hash）
+```
+class Solution {
+public:
+    typedef unsigned long long ULL;
 
-# 539 · Move Zeroes
+    ULL getHash(vector<ULL>& h, vector<ULL>& p, int L, int R)
+    {
+        return h[R] - h[L - 1] * p[R - (L - 1)];  //左移R - (L - 1)位后h[R] = 123456 h[L-1] = 123000
+    }
+    int strStr2(string &source, string &target) {
+        int m = source.size();
+        int n = target.size();
+
+        vector<ULL> shash(m + 1, 0);
+        vector<ULL> thash(n + 1, 0);
+        vector<ULL> p(m + 1, 0);
+        int P = 31;
+
+        p[0] = 1;
+        for (int i = 1; i <= m; i++)
+        {
+            p[i] = p[i - 1] * P;
+            shash[i] = shash[i - 1] * P + source[i - 1];
+        }
+
+        for (int i = 1; i <= n; i++)
+        {
+            thash[i] = thash[i - 1] * P + target[i - 1];
+        }
+
+        for (int i = 1; i + n - 1 <= m; i++)
+        {
+            ULL hh = getHash(shash, p, i, i + n - 1);
+            if (hh == thash[n])
+                return i - 1;
+        }
+        return -1;
+    }
+};
+```
+
+# 539 · Move Zeroes（同向双指针）
 
 同向双指针
 ```
@@ -172,7 +178,7 @@ public:
     }
 };
 ```
-# 443 · Two Sum - Greater than target
+# 443 · Two Sum - Greater than target（相向双指针）
 相向双指针
 ```
 class Solution {
@@ -203,7 +209,7 @@ public:
 ```
 
 
-# 382 · Triangle Count
+# 382 · Triangle Count（两个小边和如果大于这个大边，其他也都大于）
 
 从大到小找，另外两个小边和如果大于这个大边，其他也都大于
 ```
@@ -243,7 +249,7 @@ public:
 };
 ```
 
-# 460 · Find K Closest Elements
+# 460 · Find K Closest Elements（isLeftClosest）
 
 k个最接近目标值的数
 
@@ -293,7 +299,7 @@ public:
     }
 };
 ```
-# 62 · Search in Rotated Sorted Array
+# 62 · Search in Rotated Sorted Array（比较左端点，想象成一个菱形）
 想象成一个菱形，如果是上半部分，就判断是上坡，还是下坡，最后决定是r = mid或l = mid + 1
 
 和左端点比较，确定是上半部还是下半部，判断坡度，确定是上升还是下降
@@ -352,7 +358,7 @@ public:
 };
 ```
 
-# 585 · Maximum Number in Mountain Sequence
+# 585 · Maximum Number in Mountain Sequence（比较两个数即可）
 
 ```
 class Solution {
