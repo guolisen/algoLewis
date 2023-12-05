@@ -251,6 +251,8 @@ public:
 
 # 460 · Find K Closest Elements（isLeftClosest）
 
+## 901 · Closest Binary Search Tree Value II
+
 k个最接近目标值的数
 
 ```
@@ -539,6 +541,184 @@ public:
 
         return true;
     }
+};
+```
+
+# 88 · Lowest Common Ancestor of a Binary Tree(分治LCA最低公共祖先)
+
+```
+class Solution {
+public:
+    TreeNode * midtravse(TreeNode * root, TreeNode * A, TreeNode * B)
+    {
+        if (!root)
+            return nullptr;
+        if (root == A || root == B)
+            return root;
+        
+        auto l = midtravse(root->left, A, B);
+        auto r = midtravse(root->right, A, B);
+
+        if (l && r)
+            return root;
+        if (l)
+            return l;
+        if (r)
+            return r;
+        return nullptr;
+    }
+    TreeNode * lowestCommonAncestor(TreeNode * root, TreeNode * A, TreeNode * B) {
+        return midtravse(root, A, B);
+    }
+};
+```
+# 87 · Remove Node in Binary Search Tree（找到node以后，用后继替代）
+后继 int successor(TreeNode* root)
+前驱 int predescessor(TreeNode* root)
+找到node以后，用后继替代
+```
+class Solution {
+public:
+    int successor(TreeNode* root)
+    {
+        root = root->right;
+        while (root->left)
+        {
+            root = root->left;
+        }
+        return root->val;
+    }
+    int predescessor(TreeNode* root)
+    {
+        root = root->left;
+        while (root->right)
+        {
+            root = root->right;
+        }
+        return root->val;
+    }
+
+    TreeNode* removeNode(TreeNode *root, int value) {
+        if (!root)
+            return nullptr;
+        
+        if (value > root->val)
+        {
+            root->right = removeNode(root->right, value);
+        }
+        else if (value < root-> val)
+        {
+            root->left = removeNode(root->left, value); 
+        }
+        else
+        {
+            if (!root->left && !root->right)
+            {
+                return nullptr;
+            }
+            else if (root->right)
+            {
+                root->val = successor(root);
+                root->right = removeNode(root->right, root->val);
+            }
+            else
+            {
+                root->val = predescessor(root);
+                root->left = removeNode(root->left, root->val);
+            }
+        }
+        return root;
+    }
+};
+```
+
+
+
+# 4 · Ugly Number II (丑数 * 2，3，5还是丑数，每次挑最小的)
+```
+class Solution {
+public:
+    int nthUglyNumber(int n) {
+        if(n == 0)
+            return 0;
+        if(n == 1)
+            return 1;
+        vector<int> st(100000, 0);
+        st[0] = 1;
+        int s1 = 0;
+        int s2 = 0;
+        int s3 = 0;
+        for (int i = 1; i < n; i++)
+        {
+            st[i] = min(st[s1] * 2, min(st[s2] * 3, st[s3] * 5));
+            if (st[i] == st[s1] * 2)
+                s1++;
+            if (st[i] == st[s2] * 3)
+                s2++;
+            if (st[i] == st[s3] * 5)
+                s3++;
+        }
+        return st[n - 1];
+    }
+};
+```
+
+
+
+# 134 · LRU Cache（std::list::splice()）
+
+_lru.splice()
+
+将后面的元素移到前面，
+
+```
+#include <list>
+class LRUCache {
+public:
+    /*
+    * @param capacity: An integer
+    */LRUCache(int capacity): _capacity(capacity) {
+        
+    }
+
+    /*
+     * @param key: An integer
+     * @return: An integer
+     */
+    int get(int key) {
+        if (_table.count(key))
+        {
+            _lru.splice(_lru.begin(), _lru, _table[key]);
+            return _table[key]->second;
+        }
+        return -1;
+    }
+
+    /*
+     * @param key: An integer
+     * @param value: An integer
+     * @return: nothing
+     */
+    void set(int key, int value) {
+        if (_table.count(key))
+        {
+            _lru.splice(_lru.begin(), _lru, _table[key]);
+            _table[key]->second = value;
+            return;
+        }
+
+        _lru.push_front({key, value});
+        _table[key] = _lru.begin();
+        if (_lru.size() > _capacity)
+        {
+            _table.erase(_lru.back().first);
+            _lru.pop_back();
+        }
+    }
+
+    int _capacity;
+    list<pair<int, int>> _lru;
+    unordered_map<int, list<pair<int, int>>::iterator> _table;
 };
 ```
 
