@@ -1,6 +1,11 @@
 
 
+[TOC]
+
+
+
 # 1.  decltype总结
+
  https://www.cnblogs.com/ghbjimmy/p/10636030.html 
 decltype和auto都可以用来推断类型，但是二者有几处明显的差异：
 
@@ -430,3 +435,12 @@ RTTI提供了两个非常有用的操作符：typeid和dynamic_cast。
 少调用一些构造
 
 ![在这里插入图片描述](D:\code\sf\watermark,type_ZmFuZ3poZW5naGVpdGk,shadow.png)
+
+# 25 std::list::splice
+std::list 中与元素移动相关的方法有如下几种：s
+
+splice(const_iterator position, list& other): 将 other 中的所有元素移动到 list 的指定位置。
+splice(const_iterator position, list&& other): 将 other 中的所有元素移动到 list 的指定位置（移动语义）。
+splice(const_iterator position, other, const_iterator i): 将 other 中从 i 开始的单个元素移动到 list 的指定位置。
+splice(const_iterator position, other, const_iterator first, const_iterator last): 将 other 中从 first 到 last 的元素移动到 list 的指                
+原文链接：https://blog.csdn.net/h8062651/article/details/136417035
