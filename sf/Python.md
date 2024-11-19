@@ -122,3 +122,26 @@ class Solution:
                     heapq.heappush(heap, new_ugly)
         return curr_ugly
 ```
+
+## list反向遍历
+
+```
+lst = [1, 2, 3, 4, 5]
+for item in reversed(lst):
+    print(item)
+
+lst = [1, 2, 3, 4, 5]
+for item in lst[::-1]:
+    print(item)
+
+lst = [1, 2, 3, 4, 5]
+i = len(lst) - 1
+while i >= 0:
+    print(lst[i])
+    i -= 1
+
+lst = [1, 2, 3, 4, 5]
+for i in range(len(lst)-1, -1, -1):
+    print(lst[i])
+```
+
