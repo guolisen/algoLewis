@@ -176,3 +176,35 @@ public:
 
 
 
+### 88. Lowest Common Ancestor of a Binary Tree  （LCA）最小公共祖先
+
+```python
+class Solution:
+    """
+    @param: root: The root of the binary tree.
+    @param: A: A TreeNode in a Binary.
+    @param: B: A TreeNode in a Binary.
+    @return: Return the least common ancestor(LCA) of the two nodes.
+    """
+    res = None
+    def dfs(self, root, A, B):
+        if root == None:
+            return False
+
+        left = self.dfs(root.left, A, B)
+        right = self.dfs(root.right, A, B)
+        if self.res != None:
+            return False
+        if root.val == A.val or root.val == B.val:
+            if left or right:
+                self.res = root
+            return True
+        if left and right:
+            self.res = root
+        return left or right
+    def lowestCommonAncestor(self, root, A, B):
+        if self.dfs(root, A, B):
+            return root
+        return self.res
+```
+

@@ -27,6 +27,9 @@ l = mid
 ```
 如果有等号，target就会在当前if分支
 
+如果想找到target必须带等号，想找旁边的数，就不带等号
+
+
 while (l < r)
 
 0 1 2 3 4 5
@@ -34,8 +37,8 @@ while (l < r)
 
 mid < target   (l = mid)    左              
       no=       =      
-3     1(2)     3(3)   	// 如果等于，就会移动left，就会找最后边的3, 如果不等于，当3时就会移动right(mid - 1)，得到1(2)
-5     3(3)     3(3)     // 如果有等号，target就会在当前if分支
+3     1(2)     3(3)   // 如果有等于号（如果当找到target时），就会移动left，就会找最后边的3, 如果没有等于号，当3时就会移动right(mid - 1)，得到1(2)
+5     3(3)     3(3)   // 如果有等号，target就会在当前if分支
 <=1   0(1)     0(1) 
 >=8   5(7)     5(7)
 
@@ -120,6 +123,7 @@ public:
 ```
 ## 宽搜 深搜
 433 · 岛屿的个数
+
 ```
 class Solution {
 public:
@@ -180,6 +184,9 @@ public:
 ```
 
 15 · 全排列
+
+深搜重点是状态还原
+
 ```
 class Solution:
     """
@@ -248,9 +255,12 @@ int gcd(int a, int b)
 {
     return b ? gcd(b, a % b) : a;
 }
+
+def gcd(self, a: int, b: int) -> int:
+    return self.gcd(b, a % b) if b else a;
 ```
 
-## Partition
+## Partition·	
 ```
         int m = A.size();
         int l = 0;
@@ -267,7 +277,10 @@ int gcd(int a, int b)
 ```
 
 ## 前缀和
+前缀和 有两种形式
+
 404 · 子数组求和 II
+
 ```c++
 #include <numeric>
 class Solution {
@@ -292,6 +305,13 @@ public:
     }
 };
 ```
+1. S = [0 for _ in range(m + 1)]
+
+2.         for i in range(1, m + 1):
+               S[i] = S[i - 1] + a[i - 1]
+
+3. ps = S[j + 1] - S[i]
+
 ```python
     def subarray_sum_i_i(self, a: List[int], start: int, end: int) -> int:
         m = len(a)
@@ -308,7 +328,26 @@ public:
                     res += 1
         return res
 ```
+138 · Subarray Sum
+
+```
+class Solution:
+    def subarraySum(self, nums):
+            prefix_hash = {0: -1}
+            prefix_sum = 0
+            for i, num in enumerate(nums):
+                prefix_sum += num
+                if prefix_sum in prefix_hash:
+                    return prefix_hash[prefix_sum] + 1, i
+                prefix_hash[prefix_sum] = i
+                
+            return -1, -1
+```
+
+
+
 ## Heap
+
 4 · 丑数 II
 ```
 import heapq
@@ -365,9 +404,146 @@ public:
 ```
 ## 并查集
 
+### 1179 · Friend Circles
+
+```c++
+class Solution {
+public:
+    int find(vector<int>& p, int x)
+    {
+        if (p[x] != x) p[x] = find(p, p[x]);
+        return p[x];
+    }
+    int findCircleNum(vector<vector<int>> &M) {
+        if (M.empty())
+            return 0;
+        int m = M.size();
+        int n = M[0].size();
+        vector<int> p(m);
+        for (int i = 0; i < m; i++)
+        {
+            p[i] = i;
+        }
+
+        for (int i = 0; i < m; i++)
+        {
+            for (int j = i + 1; j < n; j++)     //上三角
+            {
+                if (M[i][j] == 1)
+                {
+                    p[find(p, i)] = find(p, j);
+                }
+            }
+        }
+
+        set<int> resset;
+        for (int i = 0; i < m; i++)
+        {
+            resset.insert(find(p, i));
+        }
+
+        return resset.size();
+    }
+};
+```
+```python
+class Solution:
+    """
+    @param nodes: a array of Undirected graph node
+    @return: a connected set of a Undirected graph
+    """
+    p = collections.defaultdict(int)
+    def find(self, x):
+        if (self.p[x] != x): 
+            self.p[x] = self.find(self.p[x])
+        return self.p[x]
+    def connectedSet(self, nodes: List[UndirectedGraphNode]) -> List[List[int]]:
+        for n in nodes:
+            self.p[n.label] = n.label
+        
+        for n in nodes:
+            for ne in n.neighbors:
+                if self.find(n.label) != self.find(ne.label):
+                    self.p[self.find(n.label)] = self.find(ne.label)
+        
+        h = collections.defaultdict(list)
+        for n in nodes:
+            h[self.find(n.label)].append(n.label)
+
+        res = []
+        for g,l in h.items():
+            res.append(sorted(l))
+        return res
+
+```
+
+
 ## tri树
 
+### 442 · Implement Trie (Prefix Tree)
+
+```
+class Trie {
+public:
+    /*
+     * @param word: a word
+     * @return: nothing
+     */
+    int son[100000][26];
+    int cnt[100000];
+    int idx = 0;
+    void insert(string &word) {
+        int m = word.size();
+        int p = 0;
+        for (int i = 0; i < m; i++)
+        {
+            int u = word[i] - 'a';
+            if (!son[p][u]) son[p][u] = ++idx;
+            p = son[p][u];
+        }
+        cnt[p]++;
+    }
+
+    /*
+     * @param word: A string
+     * @return: if the word is in the trie.
+     */
+    bool search(string &word) {
+        int m = word.size();
+        int p = 0;
+        for (int i = 0; i < m; i++)
+        {
+            int u = word[i] - 'a';
+            if (!son[p][u]) 
+                return false;
+            p = son[p][u];
+        }
+        return cnt[p]? true: false;
+    }
+
+    /*
+     * @param prefix: A string
+     * @return: if there is any word in the trie that starts with the given prefix.
+     */
+    bool startsWith(string &prefix) {
+        int m = prefix.size();
+        int p = 0;
+        for (int i = 0; i < m; i++)
+        {
+            int u = prefix[i] - 'a';
+            if (!son[p][u]) 
+                return false;
+            p = son[p][u];
+        }
+        return true;
+    }
+};
+```
+
+### 1848 · Word Search III
+
 ## priority_queue lamda
+
 612 · K个最近的点
 ```
 /**
@@ -499,3 +675,606 @@ class Solution:
 ## LCA 二叉树最近公共祖先
 
 ## LIS 
+
+## LCA
+
+### 88 · Lowest Common Ancestor of a Binary Tree(LCA)
+
+```
+class Solution {
+public:
+    TreeNode* ans;
+    bool dfs(TreeNode* root, TreeNode* p, TreeNode* q) {
+        if (root == nullptr) return false;
+        bool lson = dfs(root->left, p, q);
+        bool rson = dfs(root->right, p, q);
+        if ((lson && rson) || ((root->val == p->val || root->val == q->val) && (lson || rson))) 
+        {
+            ans = root;
+        } 
+        return lson || rson || (root->val == p->val || root->val == q->val);
+    }
+    TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q) {
+        dfs(root, p, q);
+        return ans;
+    }
+};
+```
+
+```
+class Solution:
+    res = None
+    def dfs(self, root, A, B):
+        if root == None:
+            return False
+        l = self.dfs(root.left, A, B)
+        r = self.dfs(root.right, A, B)
+        if self.res != None:
+            return False
+        if root.val == A.val or root.val == B.val:
+            if l or r:
+                self.res = root
+            return True
+        if l and r:
+            self.res = root
+        return l or r
+
+    def lowestCommonAncestor(self, root, A, B):
+        if self.dfs(root, A, B):
+            return root
+        return self.res
+```
+
+## 二分+旋转
+
+### 159 · Find Minimum in Rotated Sorted Array
+
+要让r = mid 在有边，因为右边才是最小值的位置
+
+```
+class Solution {
+public:
+    int findMin(vector<int> &nums) {
+        int m = nums.size();
+        if (nums[0] < nums[m - 1])
+            return nums[0];
+        int l = 0;
+        int r = m - 1;
+        while (l < r)
+        {
+            int mid = (l + r) / 2;
+            if (nums[mid] < nums[0])
+            {
+                r = mid;
+            }
+            else
+            {
+                l = mid + 1;
+            }
+        }
+        return nums[l];
+    }
+};
+```
+
+### 62 · Search in Rotated Sorted Array（比较左端点，想象成一个菱形）
+
+想象成一个菱形，如果是上半部分，就判断是上坡，还是下坡，最后决定是r = mid或l = mid + 1
+
+和左端点比较，确定是上半部还是下半部，判断坡度，确定是上升还是下降
+
+
+
+159 单增加，62不确定是增加还是下降
+
+
+
+
+
+### 587 · Two Sum - Unique pairs
+
+双指针模板：
+
+```
+   def two_sum6(self, nums: List[int], target: int) -> int:
+        m = len(nums)
+        nums.sort()
+        l = 0
+        r = m - 1
+        res = 0
+        stor = []
+        while l < r:
+            s = nums[l] + nums[r]
+            if s == target:
+                t = [nums[l], nums[r]]
+                if t not in stor:
+                    res += 1
+                    stor.append(t)
+                l += 1
+            elif s > target:
+                r -= 1
+            else:
+                l += 1
+        return res
+```
+
+
+
+## 图论
+
+邻接表，邻接矩阵
+
+
+
+
+
+## 思路
+
+```
+Level 1:
+13 · Implement strStr()    KMP, 字符串hash，On2
+
+458 · Last Position of Target  二分
+
+627 · Longest Palindrome   统计，基数 - 1 = 偶数
+
+200 · Longest Palindromic Substring  
+
+415 · Valid Palindrome   isalnum()
+
+1790 · Rotate String II   
+
+* 667 · Longest Palindromic Subsequence  动态规划
+
+594 · strStr II
+
+* 841 · String Replace  s.replace
+
+```
+
+```
+Level 2 双指针
+607 · Two Sum III - Data structure design
+
+31 · Partition Array
+
+57 · 3Sum
+
+* 148 · Sort Colors
+
+404 · Subarray Sum II
+
+587 · Two Sum - Unique pairs
+
+976 · 4Sum II
+
+228 · Middle of Linked List  快慢指针
+
+* 539 · Move Zeroes  同向双指针
+
+5 · Kth Largest Element   堆
+
+144 · Interleaving Positive and Negative Numbers python heapq
+
+* 382 · Triangle Count   双向双指针两边
+
+* 443 · Two Sum - Greater than target   双向双指针两边
+
+461 · Kth Smallest Numbers in Unsorted Array   heapq -n
+
+533 · Two Sum - Closest to target
+
+608 · Two Sum II - Input array is sorted
+
+609 · Two Sum - Less than or equal to target
+
+
+```
+
+```
+Level 3  二分
+457 · Classical Binary Search
+
+458 · Last Position of Target
+
+628 · Maximum Subtree        分治深搜
+
+* 75 · Find Peak Element       二分，判断在左坡，和其余
+
+* 159 · Find Minimum in Rotated Sorted Array     二分 要让r = mid 在有边，因为右边才是最小值的位置
+
+* 460 · Find K Closest Elements     用二分找到target，isleftNear()
+
+586 · Sqrt(x) II
+
+183 · Wood Cut     木板长度二分
+
+14 · First Position of Target
+
+458 · Last Position of Target
+
+* 62 · Search in Rotated Sorted Array
+
+447 · Search in a Big Sorted Array
+
+* 585 · Maximum Number in Mountain Sequence
+
+```
+
+```
+Level 4 BFS
+433 · Number of Islands
+
+127 · Topological Sorting
+
+* 137 · Clone Graph    用一个map[原]=新, 遍历出所有node, 然后链接。
+
+611 · Knight Shortest Path
+
+* 120 · Word Ladder
+
+* 178 · Graph Valid Tree     1. 边数 == node数 - 1  2. 连通
+
+431 · Connected Component in Undirected Graph
+
+* 598 · Zombie in Matrix       
+
+605 · Sequence Reconstruction
+
+615 · Course Schedule
+
+616 · Course Schedule II
+
+618 · Search Graph Nodes
+
+630 · Knight Shortest Path II
+
+573 · Build Post Office II
+
+892 · Alien Dictionary
+
+```
+
+```
+level 5
+453 · Flatten Binary Tree to Linked List
+
+596 · Minimum Subtree
+
+900 · Closest Binary Search Tree Value
+
+88 · Lowest Common Ancestor of a Binary Tree
+
+619 · Binary Tree Longest Consecutive Sequence III
+
+902 · Kth Smallest Element in a BST
+
+* 85 · Insert Node in a Binary Search Tree
+
+175 · Invert Binary Tree
+
+597 · Subtree with Maximum Average
+
+11 · Search Range in Binary Search Tree
+
+95 · Validate Binary Search Tree
+
+87 · Remove Node in Binary Search Tree
+
+901 · Closest Binary Search Tree Value II
+
+85 · Insert Node in a Binary Search Tree
+
+175 · Invert Binary Tree
+
+597 · Subtree with Maximum Average
+
+11 · Search Range in Binary Search Tree
+
+* 95 · Validate Binary Search Tree
+
+87 · Remove Node in Binary Search Tree
+
+901 · Closest Binary Search Tree Value II
+
+```
+
+
+
+```
+Level 7
+138 · Subarray Sum
+Easy
+4 · Ugly Number II    堆
+Medium
+657 · Insert Delete GetRandom O(1)
+Medium
+685 · First Unique Number in Data Stream
+Medium
+134 · LRU Cache
+
+```
+
+
+
+
+
+## Python `collections` 模块详细代码示例
+
+### 1. namedtuple - 命名元组
+
+```python
+from collections import namedtuple
+
+# 创建命名元组类型
+Employee = namedtuple('Employee', ['name', 'id', 'title', 'salary'])
+
+# 实例化
+emp1 = Employee('John Doe', 12345, 'Software Engineer', 85000)
+emp2 = Employee('Jane Smith', 54321, 'Data Scientist', 92000)
+
+# 访问字段
+print(emp1.name)      # 输出: John Doe
+print(emp2.title)     # 输出: Data Scientist
+
+# 转换为字典
+emp_dict = emp1._asdict()
+print(emp_dict)       # 输出: {'name': 'John Doe', 'id': 12345, ...}
+
+# 替换字段值
+emp1 = emp1._replace(salary=90000)
+print(emp1.salary)    # 输出: 90000
+```
+
+### 2. deque - 双端队列
+
+```python
+from collections import deque
+
+# 创建双端队列
+d = deque(['a', 'b', 'c'])
+
+# 添加元素
+d.append('d')         # 右侧添加
+d.appendleft('z')     # 左侧添加
+print(d)              # 输出: deque(['z', 'a', 'b', 'c', 'd'])
+
+# 移除元素
+right_item = d.pop()  # 移除并返回右侧元素
+left_item = d.popleft() # 移除并返回左侧元素
+print(right_item)     # 输出: 'd'
+print(left_item)      # 输出: 'z'
+
+# 旋转队列
+d.rotate(1)           # 向右旋转1位
+print(d)              # 输出: deque(['c', 'a', 'b'])
+d.rotate(-1)          # 向左旋转1位
+print(d)              # 输出: deque(['a', 'b', 'c'])
+
+# 限制队列长度
+limited_d = deque(maxlen=3)
+for i in range(5):
+    limited_d.append(i)
+print(limited_d)      # 输出: deque([2, 3, 4], maxlen=3)
+```
+
+### 3. Counter - 计数器
+
+```python
+from collections import Counter
+
+# 创建计数器
+words = ['apple', 'banana', 'apple', 'orange', 'banana', 'apple']
+word_counts = Counter(words)
+
+print(word_counts)        # 输出: Counter({'apple': 3, 'banana': 2, 'orange': 1})
+print(word_counts['apple'])  # 输出: 3
+
+# 更新计数器
+word_counts.update(['apple', 'kiwi'])
+print(word_counts)        # 输出: Counter({'apple': 4, 'banana': 2, 'orange': 1, 'kiwi': 1})
+
+# 获取最常见元素
+print(word_counts.most_common(2))  # 输出: [('apple', 4), ('banana', 2)]
+
+# 数学运算
+c1 = Counter(a=3, b=1)
+c2 = Counter(a=1, b=2)
+print(c1 + c2)           # 输出: Counter({'a': 4, 'b': 3})
+print(c1 - c2)           # 输出: Counter({'a': 2})
+print(c1 & c2)           # 输出: Counter({'a': 1, 'b': 1}) (交集)
+print(c1 | c2)           # 输出: Counter({'a': 3, 'b': 2}) (并集)
+```
+
+### 4. defaultdict - 默认字典
+
+```python
+from collections import defaultdict
+
+# 创建默认值为0的字典
+dd_int = defaultdict(int)
+words = ['apple', 'banana', 'apple']
+for word in words:
+    dd_int[word] += 1
+print(dd_int)            # 输出: defaultdict(<class 'int'>, {'apple': 2, 'banana': 1})
+
+# 默认值为列表的字典
+dd_list = defaultdict(list)
+data = [('a', 1), ('b', 2), ('a', 3), ('b', 4)]
+for key, value in data:
+    dd_list[key].append(value)
+print(dd_list)           # 输出: defaultdict(<class 'list'>, {'a': [1, 3], 'b': [2, 4]})
+
+# 自定义默认值工厂函数
+def default_factory():
+    return {'count': 0, 'total': 0}
+
+dd_custom = defaultdict(default_factory)
+dd_custom['a']['count'] += 1
+dd_custom['a']['total'] += 10
+print(dd_custom)         # 输出: defaultdict(<function default_factory...>, {'a': {'count': 1, 'total': 10}})
+```
+
+### 5. OrderedDict - 有序字典
+
+```python
+from collections import OrderedDict
+
+# 创建有序字典
+od = OrderedDict()
+od['a'] = 1
+od['b'] = 2
+od['c'] = 3
+print(od)                # 输出: OrderedDict([('a', 1), ('b', 2), ('c', 3)])
+
+# 保持插入顺序
+od['d'] = 4
+print(list(od.keys()))   # 输出: ['a', 'b', 'c', 'd']
+
+# 移动元素到末尾
+od.move_to_end('a')
+print(list(od.keys()))   # 输出: ['b', 'c', 'd', 'a']
+
+# 弹出元素
+last_item = od.popitem(last=True)  # LIFO顺序
+first_item = od.popitem(last=False) # FIFO顺序
+print(last_item)         # 输出: ('a', 4)
+print(first_item)        # 输出: ('b', 2)
+
+# 有序字典相等性测试
+od1 = OrderedDict([('a', 1), ('b', 2)])
+od2 = OrderedDict([('b', 2), ('a', 1)])
+print(od1 == od2)        # 输出: False (顺序不同)
+```
+
+### 6. ChainMap - 链式映射
+
+```python
+from collections import ChainMap
+
+# 创建ChainMap
+dict1 = {'a': 1, 'b': 2}
+dict2 = {'b': 3, 'c': 4}
+chain = ChainMap(dict1, dict2)
+
+# 查找键 (搜索顺序: dict1 -> dict2)
+print(chain['a'])        # 输出: 1 (来自dict1)
+print(chain['b'])        # 输出: 2 (来自dict1)
+print(chain['c'])        # 输出: 4 (来自dict2)
+
+# 更新操作只影响第一个映射
+chain['c'] = 5           # 更新dict1
+print(dict1)             # 输出: {'a': 1, 'b': 2, 'c': 5}
+print(dict2)             # 输出: {'b': 3, 'c': 4} (未改变)
+
+# 添加新映射
+dict3 = {'d': 6}
+new_chain = chain.new_child(dict3)
+print(new_chain['d'])    # 输出: 6
+
+# 获取所有键 (可能有重复)
+print(list(chain.keys()))  # 输出: ['a', 'b', 'c']
+
+# 获取所有值 (可能有重复)
+print(list(chain.values()))  # 输出: [1, 2, 5, 3, 4]
+```
+
+##  数组初始化
+```
+611 · 骑士的最短路线
+visit = [[False] * n for _ in range(m)]
+127 · 拓扑排序
+de = [g for g in graph if indegree[g] == 0]
+indegree = {x : 0 for x in graph}
+
+dp = [False for _ in range(m)]
+dp = [[False] * n for _ in range(m)]
+dp = [[[False] * p for _ in range(n)] for _ in range(m)]
+```
+
+
+
+## 算法复杂度和问题规模
+
+在算法竞赛和实际编程中，时间复杂度与问题规模的关系决定了算法是否能在规定时间内（通常为1秒）完成计算。以下是常见时间复杂度及其能处理的问题规模总结（基于现代计算机约 **10^8 - 10^9 次操作/秒** 的估算）：
+
+---
+
+### **1. O(1) — 常数时间**
+- **能处理的规模**：任意大（与输入规模无关）。
+- **示例**：哈希表查询、数学公式计算。
+
+---
+
+### **2. O(log n) — 对数时间**
+- **能处理的规模**：近乎无限（如 `n ≤ 10^18`）。
+- **示例**：二分查找、快速幂、平衡树操作。
+
+---
+
+### **3. O(√n) — 平方根时间**
+- **能处理的规模**：`n ≤ 10^14`。
+- **示例**：质数判定（试除法）、因数枚举。
+
+---
+
+### **4. O(n) — 线性时间**
+- **能处理的规模**：`n ≤ 10^7 - 10^8`。
+- **示例**：遍历数组、线性动态规划。
+
+---
+
+### **5. O(n log n) — 线性对数时间**
+- **能处理的规模**：`n ≤ 10^5 - 10^6`。
+- **示例**：快速排序、归并排序、线段树/树状数组操作。
+
+---
+
+### **6. O(n²) — 平方时间**
+- **能处理的规模**：`n ≤ 10^3 - 10^4`。
+- **示例**：冒泡排序、朴素动态规划（如最长公共子序列）。
+
+---
+
+### **7. O(n³) — 立方时间**
+- **能处理的规模**：`n ≤ 200 - 500`。
+- **示例**：Floyd-Warshall 算法、三重循环暴力。
+
+---
+
+### **8. O(2ⁿ) — 指数时间**
+- **能处理的规模**：`n ≤ 20 - 25`（递归/暴力搜索）。
+- **示例**：子集枚举、暴力回溯。
+
+---
+
+### **9. O(n!) — 阶乘时间**
+- **能处理的规模**：`n ≤ 10 - 12`。
+- **示例**：全排列生成、旅行商问题（TSP）暴力解。
+
+---
+
+### **关键注意事项**
+1. **常数因子**：大O记号忽略常数，但实际中若常数过大（如 `10^6`），可能使 O(n) 算法超时。
+2. **内存访问**：缓存友好性（如连续数组遍历 vs 链表跳跃）影响实际速度。
+3. **语言差异**：C++ 比 Python/Java 更快，可放宽规模约 2-10 倍。
+4. **问题限制**：某些题目时间宽松（如 2-5秒），可适当扩大规模。
+
+---
+
+### **参考对照表**
+| 时间复杂度 | 安全规模（C++） | 安全规模（Python） |
+| ---------- | --------------- | ------------------ |
+| O(n!)      | n ≤ 11          | n ≤ 10             |
+| O(2ⁿ)      | n ≤ 24          | n ≤ 20             |
+| O(n³)      | n ≤ 500         | n ≤ 200            |
+| O(n²)      | n ≤ 10^4        | n ≤ 5×10³          |
+| O(n log n) | n ≤ 10^6        | n ≤ 10^5           |
+| O(n)       | n ≤ 10^8        | n ≤ 10^7           |
+
+---
+
+通过选择合适的时间复杂度算法，可以避免超时问题。在设计算法时，优先考虑更低时间复杂度的解法，并结合问题约束调整优化。
+
+
+

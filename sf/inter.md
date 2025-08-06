@@ -40,8 +40,8 @@ public:
     }
 };
 ```
-# 667 · 最长的回文序列（区间DP）
-区间dp
+# 667 ·  Longest Palindromic Subsequence 最长的回文序列（区间DP）
+区间dp  子序列，不连续但是顺序固定，子数组/子字符串，连续
 ```
 class Solution {
 public:
@@ -72,7 +72,9 @@ public:
 };
 ```
 
-# 200 · 最长回文子串（区间 DP，从里往外算）
+# 200 · Longest Palindromic Substring 最长回文子串（区间 DP，从里往外算）
+
+
 
 区间 DP，从里往外算
 
@@ -114,7 +116,57 @@ public:
     }
 };
 ```
+# 76 · Longest Increasing Subsequence(LIS)
+
+```
+class Solution {
+public:
+    int longestIncreasingSubsequence(vector<int> &nums) {
+        if (nums.empty())
+            return 0;
+        int m = nums.size();
+        vector<int> f(m, 1);
+        int res = 1;
+        for (int i = 1; i < m; i++)
+        {
+            for (int j = 0; j < i; j++)
+            {
+                if (nums[i] > nums[j])
+                {
+                    f[i] = max(f[i], f[j] + 1);
+                    res = max(res, f[i]);
+                }
+            }
+        }
+        return res;
+    }
+};
+```
+
+```
+class Solution:
+    def longest_increasing_subsequence(self, nums: List[int]) -> int:
+        m = len(nums)
+        if m == 0:
+            return 0
+        dp = [1 for _ in range(m)]
+
+        res = 1
+        for i in range(1, m):
+            for j in range(i):
+                if nums[i] > nums[j]:
+                    dp[i] = max(dp[i], dp[j] + 1)
+                    res = max(res, dp[i])
+        return res
+
+```
+
+
+
+
+
 # 594 · 字符串查找 II（字符串hash）
+
 ```
 class Solution {
 public:
@@ -544,6 +596,33 @@ public:
 };
 ```
 
+```
+1. 边数 = 节点数 - 1
+2. 宽搜所有节点看连通性
+class Solution:
+    def valid_tree(self, nnum: int, edges: List[List[int]]) -> bool:
+        if len(edges) != nnum - 1:
+            return False
+        d = collections.defaultdict(list)
+        for e in edges:
+            d[e[0]].append(e[1])
+            d[e[1]].append(e[0])
+        q = collections.deque([0])
+        visit = [0]
+        while len(q) != 0:
+            cur = q.popleft()
+
+            for n in d[cur]:
+                if n not in visit:
+                    visit.append(n)
+                    q.append(n)
+        return len(visit) == nnum
+```
+
+
+
+
+
 # 88 · Lowest Common Ancestor of a Binary Tree(分治LCA最低公共祖先)
 
 ```
@@ -722,3 +801,5 @@ public:
 };
 ```
 
+
+# 150 · Best Time to Buy and Sell Stock II
