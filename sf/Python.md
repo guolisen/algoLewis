@@ -326,6 +326,102 @@ for i in range(len(lst)-1, -1, -1):
     print(lst[i])
 ```
 
+## Python dict()
+在 Python 中，字典（`dict`）是一种键值对（`key-value`）数据结构，用于存储和快速查找数据。判断某个 `key` 是否存在于字典中，有以下几种常用方法：
+
+
+### 一、字典的基本使用（快速回顾）
+先简单了解字典的创建和基本操作，方便理解后续内容：
+```python
+# 创建字典
+my_dict = {
+    "name": "Alice",
+    "age": 30,
+    "city": "New York"
+}
+
+# 访问值（通过 key）
+print(my_dict["name"])  # 输出：Alice
+
+# 添加/修改键值对
+my_dict["email"] = "alice@example.com"  # 添加新 key
+my_dict["age"] = 31  # 修改已有 key 的值
+```
+
+
+### 二、判断 key 是否存在的 3 种方法
+
+#### 1. 使用 `in` 关键字（推荐）
+`in` 是最简洁直观的方法，直接判断 `key` 是否在字典的键集合中，返回 `True` 或 `False`。
+
+```python
+my_dict = {"name": "Alice", "age": 30}
+
+# 判断 "name" 是否存在
+print("name" in my_dict)  # 输出：True
+
+# 判断 "email" 是否存在
+print("email" in my_dict)  # 输出：False
+```
+
+- 原理：`key in dict` 等价于 `key in dict.keys()`（`dict.keys()` 返回所有键的集合）。
+- 优势：简洁、高效，时间复杂度为 O(1)（字典的核心优势）。
+
+
+#### 2. 使用 `dict.get()` 方法
+`get(key, default)` 方法用于获取 `key` 对应的值，若 `key` 不存在则返回 `default`（默认值为 `None`）。可通过判断返回值是否为默认值来间接判断 `key` 是否存在。
+
+```python
+my_dict = {"name": "Alice", "age": 30}
+
+# 若 key 不存在，返回 None（默认）
+if my_dict.get("email") is None:
+    print("'email' 不存在")  # 输出：'email' 不存在
+
+# 自定义默认值，更明确区分
+if my_dict.get("email", "不存在") == "不存在":
+    print("'email' 不存在")  # 输出：'email' 不存在
+```
+
+- 注意：若 `key` 存在但对应的值恰好是 `None`，则无法用 `get(key) is None` 判断（会误判），此时推荐用 `in` 关键字。
+
+
+#### 3. 使用 `dict.has_key()` 方法（不推荐）
+这是 Python 2 中的方法，在 Python 3 中已被移除，**不建议使用**，仅作了解：
+```python
+# Python 2 中可用，Python 3 中会报错
+my_dict = {"name": "Alice"}
+print(my_dict.has_key("name"))  # Python 2 输出：True
+```
+### 三、总结
+- **推荐用法**：`key in dict`（简洁、高效、无歧义）。
+- **场景选择**：
+  - 仅判断存在性：用 `in`。
+  - 判断存在性的同时需要获取值：用 `get()`（如 `value = my_dict.get(key, default_value)`）。
+
+例如，实际开发中常见写法：
+```python
+my_dict = {"name": "Alice", "age": 30}
+key = "email"
+
+if key in my_dict:
+    print(f"{key} 存在，值为：{my_dict[key]}")
+else:
+    print(f"{key} 不存在")
+```
+
+### 删除dict元素
+
+```
+my_dict = {"name": "Alice", "age": 30, "city": "New York"}
+
+# 删除 key 为 "age" 的元素
+del my_dict["age"]
+print(my_dict)  # 输出：{'name': 'Alice', 'city': 'New York'}
+```
+
+
+
 ## Python `set()` 使用详解
 
 `set()` 是 Python 中的集合数据类型，用于存储**唯一、无序**的元素集合。以下是 `set` 的详细用法：
@@ -462,6 +558,37 @@ sl = list(s)
 sl[1] = 'f'
 ns = ''.join(sl)
 ```
+
+```
+# 定义一个包含大写字母的字符串
+original_str = "Hello World! PYTHON IS FUN."
+
+# 使用 lower() 方法转换为小写
+lowercase_str = original_str.lower()
+```
+
+```
+s为字符串 s[::-1]会新生成一个列表，要原地反转需要s.reverse()
+```
+
+## list注意
+
+list(cur)会生成一个新的list，保证旧的list变化的时候不会影响结果
+
+```
+cur = [1, 2, 3]
+res = []
+
+# 添加 cur 的浅拷贝（新列表）
+res.append(list(cur))
+
+# 修改原 cur，不会影响 res 中已添加的列表
+cur.append(4)
+
+print(cur)  # 输出：[1, 2, 3, 4]（原列表被修改）
+print(res)  # 输出：[[1, 2, 3]]（res 中的列表仍是添加时的状态）
+```
+
 
 
 
@@ -751,6 +878,14 @@ print(MOD == 1000000007)  # 输出 True
 
 ```
 -math.inf, math.inf
+INT_MIN, INT_MAX = -2**31, 2**31 - 1
+```
+
+## 最大值
+
+```
+MAX = sys.maxsize
+ans = [MAX for i in range(amount + 1)]
 ```
 
 
@@ -779,3 +914,172 @@ arr.sort(key = functools.cmp_to_key(cmp))
 
 ```
 
+## list reverse
+
+```
+res.reverse()
+```
+
+## heapq 排序入堆
+
+```
+heapq.heappush(h, (-d, -p.x, -p.y))
+```
+
+### 612 · K Closest Points
+
+```
+import heapq
+class Solution:
+    """
+    @param points: a list of points
+    @param origin: a point
+    @param k: An integer
+    @return: the k closest points
+    """
+    def dist(self, a, b):
+        return math.pow(a.x - b.x, 2) + math.pow(a.y - b.y, 2)
+    def k_closest(self, points: List[Point], origin: Point, k: int) -> List[Point]:
+        h = []
+        for p in points:
+            d = self.dist(p, origin)
+            heapq.heappush(h, (-d, -p.x, -p.y))
+            if len(h) > k:
+                heapq.heappop(h)
+        res =[]
+        while len(h) > 0:
+            _, x, y = heapq.heappop(h)
+            res.append(Point(-x, -y))
+        res.reverse()
+        return res
+```
+
+## Str.find()
+
+```
+s = "hello world, hello python"
+
+index = s.find("hello")
+print(index)  # 输出：0
+
+index = s.find("hello", 6)
+print(index)  # 输出：13（第二个 "hello" 的起始位置）
+
+```
+
+## list.index()
+
+```
+lst = [10, 20, 30, 20, 40]
+
+# 查找元素 20 的第一个位置
+print(lst.index(20))  # 输出：1
+
+# 从索引 2 开始查找 20
+print(lst.index(20, 2))  # 输出：3（找到索引 3 的 20）
+```
+
+
+
+## 删除字符串字符
+
+```
+new_str = s[:i] + s[i+1:]  //拼接
+```
+
+```
+# 转换为列表
+lst = list(s)
+# 删除索引 i 的元素
+del lst[i]  # 或 lst.pop(i)
+# 转回字符串
+new_str = ''.join(lst)
+```
+
+## ord() and chr()
+
+```
+print(ord('A'))   # 输出：65（大写字母 A 的 ASCII 码）
+print(ord('a'))   # 输出：97（小写字母 a 的 ASCII 码）
+print(ord('0'))   # 输出：48（数字 0 的 ASCII 码）
+print(ord(' '))   # 输出：32（空格的 ASCII 码）
+print(ord('!'))   # 输出：33（感叹号的 ASCII 码）
+```
+
+```
+c = 'B'
+code = ord(c)
+print(code)          # 输出：66
+print(chr(code))     # 输出：'B'（将编码转回字符）
+```
+
+## 去重
+
+```
+nums: List[int]
+n = set(nums)
+```
+
+## Stack
+
+```
+# 初始化栈（空列表）
+stack = []
+
+# 入栈
+stack.append(1)
+stack.append(2)
+stack.append(3)
+print(stack)  # 输出：[1, 2, 3]（栈顶是 3）
+
+# 取栈顶
+print(stack[-1])  # 输出：3
+
+# 出栈
+top = stack.pop()
+print(top)       # 输出：3
+print(stack)     # 输出：[1, 2]（栈顶变为 2）
+
+# 判断空栈
+print(not stack)  # 输出：False（栈非空）
+
+# 栈大小
+print(len(stack))  # 输出：2
+```
+
+```
+from collections import deque
+
+# 初始化栈
+stack = deque()
+
+# 入栈
+stack.append(1)
+stack.append(2)
+stack.append(3)
+print(list(stack))  # 输出：[1, 2, 3]
+
+# 取栈顶
+print(stack[-1])  # 输出：3
+
+# 出栈
+top = stack.pop()
+print(top)        # 输出：3
+print(list(stack))  # 输出：[1, 2]
+```
+
+## list中如何返回最大值的索引
+
+```
+lst = [3, 1, 4, 1, 5, 9, 2, 6]
+
+# 步骤1：找到最大值
+max_value = max(lst)  # 结果：9
+
+# 步骤2：找到最大值的索引
+max_index = lst.index(max_value)  # 结果：5（9 首次出现在索引 5）
+
+print(max_index)  # 输出：5
+```
+
+## for s,f in enumerate(p):

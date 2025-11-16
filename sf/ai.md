@@ -274,7 +274,7 @@ BERT 模型通常用于需要理解文本深层语义的任务，如文本分类
 
 \- 知识注入：将领域特定的知识以文本、结构化数据或知识图谱的形式注入到预训练过程中。
 
-\- 多模态学习：如果适用，可以使用多模态数据（如文本和图像）进行预训练，以丰富模型的知识表示。
+xxxxxxxxxx // 接口：形状interface Shape {  double calculateArea(); // 计算面积}​// 实现类：圆形class Circle implements Shape {  private double radius;​  public Circle(double radius) {      this.radius = radius;  }​  @Override  public double calculateArea() {      return Math.PI * radius * radius;  }}​// 实现类：矩形class Rectangle implements Shape {  private double width;  private double height;​  public Rectangle(double width, double height) {      this.width = width;      this.height = height;  }​  @Override  public double calculateArea() {      return width * height;  }}​// 客户端代码：多态调用public class Client {  public static void main(String[] args) {      Shape circle = new Circle(5);      Shape rectangle = new Rectangle(3, 4);​      System.out.println("圆形面积：" + circle.calculateArea()); // 输出：78.5398...      System.out.println("矩形面积：" + rectangle.calculateArea()); // 输出：12.0  }}java
 
 
 

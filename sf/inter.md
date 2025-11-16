@@ -118,6 +118,8 @@ public:
 ```
 # 76 · Longest Increasing Subsequence(LIS)
 
+f[i\] 表示所有以第i个字符为结尾的上升子序列
+
 ```
 class Solution {
 public:
@@ -163,7 +165,57 @@ class Solution:
 
 
 
+# 77 · Longest Common Subsequence（LCS） 最长公共子序列
 
+f [ i \]\[ j ] 为第一个序列前i个字符中，和第二个序列前j个字符中的公共序列。所有在第一个序列的前i个字母中出现的，且在第二个序列中的前j个字母中出现的子序列
+
+转移方程是看最后一个字符是否选取，a[i],b[j], 都选‘f[i - 1\][j - 1] + 1’, 都不选 f[i - 1\][j - 1]
+
+```
+int longestCommonSubsequence(string &A, string &B) {
+    int m1 = A.size();
+    int m2 = B.size();
+    vector<vector<int>> f(m1 + 1, vector<int>(m2 + 1, 0));
+
+    for (int i = 1; i <= m1; i++)
+    {
+        for (int j = 1; j <= m2; j++)
+        {
+            f[i][j] = max(f[i - 1][j], f[i][j - 1]);
+            if (A[i - 1] == B[j - 1])
+            {
+                f[i][j] = max(f[i][j], f[i - 1][j - 1] + 1);
+            }
+        }
+    }
+    return f[m1][m2];
+}
+```
+
+# 124 · Longest Consecutive Sequence（可结合字符串处理数字序列）
+
+   利用hash
+
+   ```
+   class Solution:
+       def longestConsecutive(self, nums: List[int]) -> int:
+           if len(nums) == 0:
+               return 0
+           m = len(nums)
+           ns = set(nums)
+   
+           maxlen = 1
+           for c in ns:
+               if c - 1 not in ns:
+                   curlen = 1
+                   curchr = c
+                   while curchr + 1 in ns:
+                       curlen += 1
+                       maxlen = max(maxlen, curlen)
+                       curchr += 1
+   
+           return maxlen
+   ```
 
 # 594 · 字符串查找 II（字符串hash）
 
@@ -651,7 +703,34 @@ public:
     }
 };
 ```
+## **LeetCode 235. Lowest Common Ancestor of a Binary Search Tree**(二叉搜索树的最近公共祖先)
+
+```
+class Solution:
+    """
+    @param root: root of the tree
+    @param p: the node p
+    @param q: the node q
+    @return: find the LCA of p and q
+    """
+    def dfs(self, root, p, q):
+        if root == None:
+            return None
+        if root == p or root == q:
+            return root
+        if root.val >= p.val and root.val >= q.val:
+            return self.dfs(root.left, p, q)
+        elif root.val <= p.val and root.val <= q.val:
+            return self.dfs(root.right, p, q)
+        return root
+    def lowestCommonAncestor(self, root, p, q):
+        return self.dfs(root, p, q)
+```
+
+
+
 # 87 · Remove Node in Binary Search Tree（找到node以后，用后继替代）
+
 后继 int successor(TreeNode* root)
 前驱 int predescessor(TreeNode* root)
 找到node以后，用后继替代
@@ -801,5 +880,10 @@ public:
 };
 ```
 
-
 # 150 · Best Time to Buy and Sell Stock II
+
+
+
+
+
+# 363 · Trapping Rain Water 接雨水
