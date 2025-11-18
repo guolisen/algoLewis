@@ -1083,3 +1083,22 @@ print(max_index)  # 输出：5
 ```
 
 ## for s,f in enumerate(p):
+
+
+
+## any
+
+`any()` 是一个内置函数，用于**判断可迭代对象（如列表、元组、集合等）中是否至少有一个元素为 “真”（True）**。它的核心作用是快速检查 “是否存在满足条件的元素”。
+
+```
+# 示例：检查列表中是否有偶数
+numbers = [1, 3, 5, 7, 8]
+has_even = any(x % 2 == 0 for x in numbers)
+print(has_even)  # 输出 True（8 是偶数）
+
+# 示例：检查字符串列表中是否有非空字符串
+strings = ["", "", "hello", ""]
+has_non_empty = any(s for s in strings)  # 等价于 any(len(s) > 0 for s in strings)
+print(has_non_empty)  # 输出 True（"hello" 是非空）
+```
+
