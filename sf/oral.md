@@ -153,3 +153,113 @@ I’ve actually had a great time with my current team—everyone’s collaborati
 "Our system is divided into many modules. When we solve a problem, we need to analyze each one to track down the issue. And for any bug fix, we have to make changes in all the related modules, which often means I'll be touching the underlying code as well."
 
 Our system is made up of many modules. So when fixing a bug, we need to look through all the relevant ones, and that usually means I'll have to go down and modify the underlying code too.
+
+
+
+# 优缺点
+
+接受新事物快，对新事物可以很快研究明白
+
+喜欢总结，文档
+
+目标明确，总给自己一个目标
+
+对自己的缺点不停反省，想办法弥补，甚至改正
+
+I think my strengths are: I pick up new stuff real fast—if the team needs a new tech or tool, I can jump in and figure it out quickly. Also, I like summarizing things, like writing clear docs or sharing key takeaways from projects. That helps the team stay on the same page. And I always set clear goals for myself—having a target keeps me focused and makes sure I get things done.
+
+For weaknesses? I’m always thinking about them. If I notice something I’m not good at, I don’t just leave it— I try to fix it, like learning a new skill or changing how I work. That way, I keep getting better.
+
+
+
+
+
+### 1. Introduce yourself
+
+Hi, I’m Guo Lisen. I have a master’s in Software Engineering from Jilin University and over 15 years of professional experience as a software engineer. I currently work at Dell EMC, focusing on C++ backend and cloud-native storage development. I’m really interested in your C++ backend role, so I applied.
+
+Our positions are all very stable, and no one leaves.
+
+C# is not my primary language.
+
+
+
+
+
+Hi everyone! I'm Guo Lisen, 43 years old from Beijing. I’ve got over 15 years of experience as a software engineer and hold a master’s degree in Software Engineering from Jilin University.
+
+Right now, I work as a Senior Software Engineer at Dell EMC. I’ve focused on core module development for products like Dell PowerStore—specifically on FSCK and mapper file systems—and Unity XT, mainly using C++, Python, and Go. I’ve also used C# before, but just to maintain a client toolkit for Windows; it’s not my primary language.
+
+Plus, I have strong Kubernetes (K8s) experience. I designed and built a storage-operator POD for K8s that automates things like disk replacement and health checks. We also worked on some AI-related tools using LangChain and LangGraph—for example, to improve disk health checks.
+
+Before Dell, I was at Nokia Beijing. There, I developed and maintained Linux O&M apps and embedded software for base stations.
+
+I value teamwork and communication a lot. I always listen carefully to my teammates’ ideas and work well with everyone to get tasks done. I’m passionate about learning new technologies and dedicated to software development. Thanks!
+
+
+
+Hi everyone! I'm Guo Lisen, 43 years old from Beijing. I’ve got over 15 years of experience as a software engineer and hold a master’s degree in Software Engineering from Jilin University.
+
+Right now, I work as a Senior Software Engineer at Dell EMC. I’ve focused on core module development for key products here – like Dell PowerStore, where I worked on its FSCK and mapper file systems, and Unity XT. Most of my work uses C++, Python, and Go, and I also have strong Kubernetes (K8s) experience: I designed and developed a storage-operator POD for K8s, which automates tasks like disk replacement and health checks. Before joining Dell, I was at Nokia Beijing, where I developed and maintained Linux O&M applications and embedded software for base stations.
+
+I’ve also done some AI-related work during my time at the company. I used LangChain and LangGraph to build an agent platform（MCP） – this platform can automatically install systems for devices, monitor device status, and even provide interfaces for other possible AI applications. Plus, I applied LangGraph to implement REACT in the storage operator, which helps with more accurate disk health checks: it detects disk issues and sends the check results directly to the UI.
+
+I value teamwork and communication a lot. I always listen carefully to my teammates’ ideas and work well with everyone to get tasks done. I’m passionate about learning new technologies and dedicated to software development. Thanks!
+
+
+
+### 2. Why are you interested in Microsoft?
+
+First, I’ve always admired Microsoft—especially Azure’s powerful cloud infrastructure and how you build robust, scalable backend systems that support so many businesses. I also love that you value technical excellence and real impact. Plus, this C++ backend role lines up perfectly with my experience in storage systems and high-performance coding, so I’m excited about the chance to contribute.
+
+### 3. Why should we hire you?
+
+I bring 10+ years of C++ experience—led backend development for enterprise storage systems, optimized performance, and built high-availability modules. I also have experience with cloud tools like Kubernetes, which I used to build storage management Operators. I’m a team player who delivers results, and I can jump right into your backend projects to support Azure’s growth.
+
+### 4. Why are you looking for a change?
+
+I’ve had a great time at Dell EMC—my team’s collaborative, and we’ve built some solid products. But I want to stretch my skills more, especially with large-scale cloud backend work like Azure’s. Your role lets me dive deeper into C++-based scalable systems, which is exactly the new challenge I’m after.
+
+### 5. What do you like the most about your current position?
+
+Our team has an awesome collaborative vibe—everyone’s helpful and focused on delivering quality work. I also enjoy the technical depth of storage system development, which has helped me sharpen my C++ and cloud-native skills.
+
+### 6. What do you like the least about your current position?
+
+There’s nothing I really dislike—my team and work are great. The only thing is that my current tasks are a bit narrow in scope. I’d love to take on more challenges with larger-scale cloud backend systems, which is why this role appeals to me.
+
+### 7. What is your biggest strength?
+
+I’m a fast learner and self-driven—pick up new tech quickly, like Go and Kubernetes, when the project needs it. I’m also a good team player who communicates well, and I’m strong at solving complex backend and performance issues.
+
+### 8. What is your biggest weakness?
+
+Sometimes I waste too much time fixing tiny code things to get them exactly right. I’ve noticed it can slow me down a bit, so now I focus on balancing detail with big-picture goals to stay productive.
+
+### 9. How do you deal with conflict?
+
+I always keep it professional—no personal stuff. Once, my team disagreed on a storage module design. I did some quick research, put together a simple prototype to show pros and cons, and we talked it through. We went with the option best for the project, and it worked out well. 
+
+We selected the most suitable solution for the project, and the results were excellent.
+
+
+
+Yes, one example was that when we were designing the XXXX feature, there were multiple different options and we were not able to reach an agreement. I believe that we should do whatever is the best for our project and for our team. So what I did was that I've done some further research and came up with a prototype with lots of supporting evidence, and showed it to the manager, and they were convinced. And the final outcome turns out to be great.
+
+### 10. What’s the most challenging situation you’ve ever met?
+
+At Dell, we had a tight deadline to optimize a storage system’s response speed. I realized we were short on time, so I first analyzed the bottlenecks, then talked to my manager and teammates. We split tasks, focused on key optimizations (like C++ code tweaks), and met the deadline—we even boosted the system’s speed by 10%.
+
+
+
+As a software engineer, deadline is always the biggest challenge. There were a couple of times where I discovered that we might not be able to meet the deadline. What I did was that I do some research first, and have a good idea on what’s missing — perhaps we need more resources, or perhaps we’ve underestimated the problem. Most importantly, I’ve come up with some alternative solutions. Then I will immediately communicate to my manager and my senior engineers, let them know the situation, show them the homework I did to support my opinion, and discuss with them how can we resolve this situation.
+
+### 11. What if your opinion is different than your manager?
+
+I’d have a relaxed chat—no pressure. I’d share my thoughts and supporting facts, then listen to their perspective. It’s never personal; we’re both working for the team’s success. I’d go with the decision that’s best for the project and company.
+
+Yes, that has happened before. When I encounter this situation, I will just take a step back and have a very relaxed discussion with my manager. Let's just chat and see what's the best for our team and our company. There's nothing personal; we work as a team and I know the importance of communication.
+
+### 12. Introduce one of your past projects
+
+Sure, at Dell EMC, I led the scale-out project for our DataDomain storage system. We needed to automate disk management, so I built a Kubernetes-based Operator with Go and C++. It handled automatic disk failure detection and capacity scaling, cutting 运维 costs by 60%. I also used C++ to optimize the file system, which improved stability for key clients like banks and hospitals.

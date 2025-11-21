@@ -1102,3 +1102,90 @@ has_non_empty = any(s for s in strings)  # 等价于 any(len(s) > 0 for s in str
 print(has_non_empty)  # 输出 True（"hello" 是非空）
 ```
 
+# 自定义比较函数（comparecompare function）
+
+在 Python 中，对列表进行排序时，可以通过 `key` 参数指定排序依据，也可以通过 `functools.cmp_to_key` 将**自定义比较函数（comparecompare function）** 转换为排序键，从而实现自定义排序逻辑。
+
+`compare` 函数的作用是**定义两个元素的比较规则**，返回值决定了元素的排序顺序：
+
+- 返回负数：第一个元素排在第二个元素前面；
+- 返回正数：两个元素位置不变；
+- 返回正数：第二个元素排在第一个元素前面。
+
+示例 1：用 compare 函数自定义排序（数字按绝对值大小排序）
+
+```python
+from functools import cmp_to_key
+
+# 定义 compare 函数：按绝对值从小到大排序
+def compare(a, b):
+    if abs(a) < abs(b):
+        return -1  # a 排在 b 前面
+    elif abs(a) > abs(b):
+        return 1   # b 排在 a 前面
+    else:
+        return 0   # 位置不变
+
+# 待排序的列表
+nums = [3, -1, 2, -4]
+
+# 使用 cmp_to_key 转换 compare 函数为 key，传入 sort 方法
+nums.sort(key=cmp_to_key(compare))
+
+print(nums)  # 输出：[-1, 2, 3, -4]（绝对值 1 < 2 < 3 < 4）
+```
+
+示例 2：对字符串按长度排序（长的在后）
+
+```python
+from functools import cmp_to_key
+
+# 定义 compare 函数：按字符串长度从小到大排序
+def compare_str(a, b):
+    if len(a) < len(b):
+        return -1  # a 在前
+    elif len(a) > len(b):
+        return 1   # b 在前
+    else:
+        return 0   # 长度相同则位置不变
+
+words = ["apple", "cat", "banana", "dog"]
+
+# 应用排序
+words.sort(key=cmp_to_key(compare_str))
+
+print(words)  # 输出：['cat', 'dog', 'apple', 'banana']（长度 3 < 3 < 5 < 6）
+```
+
+1. **`cmp_to_key` 的作用**：Python 3 的 `sort` 方法默认只接受 `key` 参数，`cmp_to_key` 是 `functools` 模块提供的工具，用于将传统的 compare 函数转换为 `sort` 可识别的 key。
+2. **与 `key` 参数的区别**：
+    - `key=函数`：为每个元素生成一个 “排序键”（如 `key=len` 用长度作为键），排序依据键的大小；
+    - `compare` 函数：直接定义两个元素的比较逻辑，更灵活（适合复杂的多条件排序）。
+3. **适用场景**：当排序规则复杂（如多条件组合、自定义比较逻辑）时，用 compare 函数更直观。
+
+示例 3：多条件排序（先按奇偶，再按大小）
+
+```python
+from functools import cmp_to_key
+
+# 规则：奇数排在偶数前面；同是奇数/偶数则按从小到大排序
+def compare_num(a, b):
+    # 先判断奇偶
+    if a % 2 == 1 and b % 2 == 0:
+        return -1  # 奇数 a 在前，偶数 b 在后
+    if a % 2 == 0 and b % 2 == 1:
+        return 1   # 偶数 a 在后，奇数 b 在前
+    # 同是奇数或偶数，按大小排序
+    return a - b  # 正数表示 a > b，负数表示 a < b
+
+nums = [3, 1, 4, 2, 5, 6]
+nums.sort(key=cmp_to_key(compare_num))
+
+print(nums)  # 输出：[1, 3, 5, 2, 4, 6]（奇数在前且递增，偶数在后且递增）
+```
+
+### 总结：
+
+- `compare` 函数通过 `cmp_to_key` 转换后可用于 `sort` 方法，自定义排序逻辑；
+- 返回值的正负决定了两个元素的相对位置；
+- 适合处理复杂排序场景，比 `key` 参数更灵活但性能略低（一般可忽略）。

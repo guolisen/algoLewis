@@ -271,7 +271,57 @@ Goroutine 的切换并非严格按 “10ms 轮询”，而是由多种场景触�
   }
   ```
 
-  
+
+复制给接口的变量需要装箱，默认装箱就是在堆中，装箱是在runtime
+
+```go
+type MyInterface interface{}
+
+func create() MyInterface {
+    x := 10 // 局部变量，栈上分配
+    return x // 将 x 装箱为接口返回
+}
+
+func main() {
+    i := create() // 接口变量 i 的生命周期在 main 中，超出 create 函数
+    fmt.Println(i)
+}
+```
+
+```go
+package main
+
+import "fmt"
+
+// 定义一个接口
+type MyInterface interface {
+    Do()
+}
+
+// 定义一个实现接口的结构体
+type MyStruct struct {
+    data int
+}
+
+func (m MyStruct) Do() {
+    fmt.Println("Doing something:", m.data)
+}
+
+// 接收接口类型参数的函数
+func process(i MyInterface) {
+    i.Do()
+}
+
+func main() {
+    // 在栈上创建一个 MyStruct 实例
+    s := MyStruct{data: 100}
+
+    // 将 s 作为接口类型传递给 process 函数
+    process(s) // 这里 s 会逃逸到堆上
+}
+```
+
+然而，接口在 `process` 函数中被使用时，`main` 函数的栈帧虽然还未销毁（`process` 是 `main` 调用的，`main` 尚未退出），但编译器的逃逸分析是 **“保守策略”**：它不会去精细判断接口的使用范围是否严格在 `main` 栈帧的生命周期内，而是只要遇到 “变量被接口引用” 的情况，就默认其可能被传递到更外层（如 `process` 函数可能将接口保存到全局变量、返回给 `main` 等），因此必须确保数据地址在接口的整个生命周期内有效。
 
 ### 四、进阶特性与最佳实践
 
@@ -396,3 +446,339 @@ Goroutine 的切换并非严格按 “10ms 轮询”，而是由多种场景触�
       fmt.Println(res)
   }
   ```
+
+# Context
+
+在 Go 语言中，`context.Context`（上下文）是用于**在多个 goroutine 之间传递取消信号、超时控制、截止时间和请求元数据**的核心机制，尤其适合处理 “请求 - 响应” 模式的业务（如 HTTP 服务、RPC 调用），解决 goroutine 泄漏和资源滥用问题。
+
+面试中常考的 `context` 用法可归纳为以下核心场景，每个场景都配有简洁示例：
+
+### 一、基础概念：Context 的核心功能
+
+`context` 包的核心是 `Context` 接口，其主要方法用于传递控制信号：
+
+- `Done()`：返回一个通道，当上下文被取消或超时的时，该通道会被关闭（用于监听取消信号）；
+- `Err()`：返回上下文被取消的原因（如 `context.Canceled` 或 `context.DeadlineExceeded`）；
+- `Deadline()`：返回上下文的截止时间（若有）；
+- `Value(key interface{}) interface{}`：获取上下文携带的元数据（键值对）。
+
+`context` 是**线程安全的**，可在多个 goroutine 间共享；且遵循 “父子关系”：父上下文取消，所有子上下文也会被取消。
+
+### 二、常见用法及示例
+
+#### 1. 手动取消（`context.WithCancel`）
+
+**场景**：主动取消长时间运行的 goroutine（如用户终止请求、操作中断）。
+
+```go
+package main
+
+import (
+    "context"
+    "fmt"
+    "time"
+)
+
+// 模拟一个长时间运行的任务（如数据库查询、文件下载）
+func longRunningTask(ctx context.Context) {
+    for {
+        select {
+        case <-ctx.Done(): // 监听取消信号
+            fmt.Println("任务被取消：", ctx.Err())
+            return
+        default:
+            fmt.Println("任务运行中...")
+            time.Sleep(1 * time.Second)
+        }
+    }
+}
+
+func main() {
+    // 创建可取消的上下文（父上下文为 context.Background()，根上下文）
+    ctx, cancel := context.WithCancel(context.Background())
+
+    // 启动任务（传入上下文）
+    go longRunningTask(ctx)
+
+    // 3秒后手动取消
+    time.Sleep(3 * time.Second)
+    cancel() // 触发取消信号
+
+    // 等待任务退出（避免主程序提前结束）
+    time.Sleep(1 * time.Second)
+    fmt.Println("主程序结束")
+}
+```
+
+**输出**：
+
+```plaintext
+任务运行中...
+任务运行中...
+任务运行中...
+任务被取消： context canceled
+主程序结束
+```
+
+**关键**：`cancel` 函数是手动触发取消的 “开关”，调用后所有监听 `ctx.Done()` 的 goroutine 会收到信号并退出。
+
+#### 2. 超时控制（`context.WithTimeout`）
+
+**场景**：限制任务的最大运行时间（如 API 调用超时、网络请求超时）。
+
+```go
+package main
+
+import (
+    "context"
+    "fmt"
+    "time"
+)
+
+// 模拟一个可能超时的任务
+func fetchData(ctx context.Context) {
+    select {
+    case <-time.After(5 * time.Second): // 模拟任务耗时5秒
+        fmt.Println("数据获取成功")
+    case <-ctx.Done(): // 监听超时信号
+        fmt.Println("数据获取失败：", ctx.Err()) // 输出 "context deadline exceeded"
+    }
+}
+
+func main() {
+    // 创建超时上下文：3秒后自动取消
+    ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+    defer cancel() // 确保资源释放（即使任务提前完成）
+
+    // 启动任务
+    go fetchData(ctx)
+
+    // 等待任务结果
+    time.Sleep(6 * time.Second)
+    fmt.Println("主程序结束")
+}
+```
+
+**输出**：
+
+```plaintext
+数据获取失败： context deadline exceeded
+主程序结束
+```
+
+**关键**：`WithTimeout` 会在指定时间后自动调用 `cancel`，无需手动干预，适合 “最多等 N 秒” 的场景。
+
+#### 3. 截止时间（`context.WithDeadline`）
+
+**场景**：指定任务必须在某个具体时间点前完成（如每天 23:59 前结束的定时任务）。
+
+```go
+package main
+
+import (
+    "context"
+    "fmt"
+    "time"
+)
+
+func task(ctx context.Context) {
+    select {
+    case <-time.After(2 * time.Second):
+        fmt.Println("任务完成")
+    case <-ctx.Done():
+        fmt.Println("任务超时：", ctx.Err())
+    }
+}
+
+func main() {
+    // 设置截止时间为 1 秒后
+    deadline := time.Now().Add(1 * time.Second)
+    ctx, cancel := context.WithDeadline(context.Background(), deadline)
+    defer cancel()
+
+    go task(ctx)
+
+    time.Sleep(3 * time.Second)
+    fmt.Println("主程序结束")
+}
+```
+
+**输出**：
+
+```plaintext
+任务超时： context deadline exceeded
+主程序结束
+```
+
+**区别**：`WithTimeout` 是 “从现在起 N 秒后超时”，`WithDeadline` 是 “在某个具体时间点超时”，本质都是控制任务结束时间。
+
+#### 4. 传递元数据（`context.WithValue`）
+
+**场景**：在 goroutine 链或函数调用链中传递请求相关的元数据（如用户 ID、日志 ID、认证信息），避免在函数参数中显式传递。
+
+```go
+package main
+
+import (
+    "context"
+    "fmt"
+)
+
+// 定义key（避免与其他包的key冲突，通常用自定义类型）
+type ctxKey string
+const userIDKey ctxKey = "userID"
+
+// 下游函数：从上下文获取用户ID
+func processRequest(ctx context.Context) {
+    // 获取元数据
+    userID, ok := ctx.Value(userIDKey).(string)
+    if !ok {
+        fmt.Println("未获取到用户ID")
+        return
+    }
+    fmt.Printf("处理用户 %s 的请求\n", userID)
+}
+
+func main() {
+    // 根上下文
+    ctx := context.Background()
+    // 附加元数据（用户ID）
+    ctxWithValue := context.WithValue(ctx, userIDKey, "12345")
+
+    // 传递上下文到下游函数
+    processRequest(ctxWithValue)
+}
+```
+
+**输出**：
+
+```plaintext
+处理用户 12345 的请求
+```
+
+**注意**：
+
+- `WithValue` 应仅用于传递 “请求范围的元数据”（如临时标识），不适合传递大量数据或频繁修改的值；
+- 自定义 `key` 建议使用**非导出的自定义类型**（如 `type ctxKey string`），避免不同包的 `key` 冲突。
+
+### 三、最佳实践与面试高频考点
+
+1. **上下文的传递**：函数接收 `context.Context` 时，应将其作为**第一个参数**（如 `func doSomething(ctx context.Context, arg int)`）。
+2. **根上下文的选择**：
+    - `context.Background()`：用于主函数、初始化或测试，作为所有上下文的根；
+    - `context.TODO()`：当不确定使用哪个上下文时使用（如函数参数需要，但暂时没有合适的上下文）。
+3. **避免上下文滥用**：
+    - 不要将 `context` 存储在结构体中，应在函数调用时显式传递；
+    - 不要传递 `nil` 上下文，若不确定，用 `context.Background()`；
+    - `WithValue` 传递的数据应是 “只读的”，避免在 goroutine 间修改导致并发安全问题。
+4. **goroutine 退出的保证**：所有长时间运行的 goroutine 必须监听 `ctx.Done()`，确保在上下文取消时能及时退出，避免 goroutine 泄漏。
+
+### 总结
+
+`context` 的核心价值是 **“统一的取消和超时控制”+“安全的元数据传递”**，在并发场景中尤为重要。面试中需重点掌握 `WithCancel`（手动取消）、`WithTimeout`（超时控制）的用法，以及上下文的父子关系和最佳实践。
+
+
+
+# select
+
+Go 语言的 `select` 语句和 Unix/Linux 系统调用中的 `select()` 函数**核心目标一致**（都是「多路复用 I/O」，即同时监听多个 I/O 事件，哪个就绪就处理哪个）
+
+Go 的 `select` 有两个关键行为模式，由 `default` 分支决定：
+
+1. **有 `default` 分支**：非阻塞模式 → 立即检查所有 `case`，若没有任何通道就绪（收发可执行），直接执行 `default`，不会等待；
+2. **无 `default` 分支**：阻塞模式 → 一直等待，直到任意一个 `case` 就绪（通道收发就绪 或 超时触发），才执行对应分支。
+
+#### 场景 1：保留 `default`
+
+```go
+package main
+
+import (
+	"fmt"
+	"time"
+)
+
+func main() {
+	ch1 := make(chan string)
+	ch2 := make(chan string)
+
+	// 1秒后向 ch1 发消息
+	go func() {
+		time.Sleep(1 * time.Second)
+		ch1 <- "来自通道1的消息"
+	}()
+
+	// 2秒后向 ch2 发消息
+	go func() {
+		time.Sleep(2 * time.Second)
+		ch2 <- "来自通道2的消息"
+	}()
+
+	// 有 default 分支：非阻塞
+	select {
+	case msg1 := <-ch1:
+		fmt.Println("收到：", msg1)
+	case msg2 := <-ch2:
+		fmt.Println("收到：", msg2)
+	case <-time.After(1500 * time.Millisecond):
+		fmt.Println("超时了")
+	default:
+		fmt.Println("非阻塞模式，暂无就绪通道")
+	}
+
+	// 注意：程序会直接走到这里，不会等待协程发消息
+	fmt.Println("程序结束")
+}
+```
+
+**输出结果**：
+
+```plaintext
+非阻塞模式，暂无就绪通道
+程序结束
+```
+
+#### 场景 2：删除 `default`（阻塞模式）
+
+```go
+package main
+
+import (
+	"fmt"
+	"time"
+)
+
+func main() {
+	ch1 := make(chan string)
+	ch2 := make(chan string)
+
+	go func() {
+		time.Sleep(1 * time.Second)
+		ch1 <- "来自通道1的消息"
+	}()
+
+	go func() {
+		time.Sleep(2 * time.Second)
+		ch2 <- "来自通道2的消息"
+	}()
+
+	// 无 default 分支：阻塞等待
+	select {
+	case msg1 := <-ch1:
+		fmt.Println("收到：", msg1) // 1秒后就绪，会执行这里
+	case msg2 := <-ch2:
+		fmt.Println("收到：", msg2)
+	case <-time.After(1500 * time.Millisecond):
+		fmt.Println("超时了")
+	}
+
+	fmt.Println("程序结束")
+}
+```
+
+**输出结果**：
+
+```plaintext
+收到：来自通道1的消息
+程序结束
+```
