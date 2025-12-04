@@ -350,7 +350,285 @@ def gcd(self, a: int, b: int) -> int:
         }
 ```
 
+快速排序算法模板 —— 模板题 AcWing 785. 快速排序
+```
+void quick_sort(int q[], int l, int r)
+{
+    if (l >= r) return;
+
+    int i = l - 1, j = r + 1, x = q[l + r >> 1];
+    while (i < j)
+    {
+        do i ++ ; while (q[i] < x);
+        do j -- ; while (q[j] > x);
+        if (i < j) swap(q[i], q[j]);
+    }
+    quick_sort(q, l, j), quick_sort(q, j + 1, r);
+}
+```
+归并排序算法模板 —— 模板题 AcWing 787. 归并排序
+```
+void merge_sort(int q[], int l, int r)
+{
+    if (l >= r) return;
+
+    int mid = l + r >> 1;
+    merge_sort(q, l, mid);
+    merge_sort(q, mid + 1, r);
+    
+    int k = 0, i = l, j = mid + 1;
+    while (i <= mid && j <= r)
+        if (q[i] <= q[j]) tmp[k ++ ] = q[i ++ ];
+        else tmp[k ++ ] = q[j ++ ];
+    
+    while (i <= mid) tmp[k ++ ] = q[i ++ ];
+    while (j <= r) tmp[k ++ ] = q[j ++ ];
+    
+    for (i = l, j = 0; i <= r; i ++, j ++ ) q[i] = tmp[j];
+}
+```
+
+C++
+
+```cpp
+#include <vector>
+#include <algorithm>  // 用于 swap
+
+// 直接操作 vector<int>，l=左边界，r=右边界（闭区间）
+void quick_sort(std::vector<int>& q, int l, int r) {
+    if (l >= r) return;
+
+    int i = l - 1, j = r + 1;
+    int x = q[(l + r) >> 1];  // 取中间元素作为基准
+
+    while (i < j) {
+        do i++; while (q[i] < x);  // 找到 >=x 的元素
+        do j--; while (q[j] > x);  // 找到 <=x 的元素
+        if (i < j) std::swap(q[i], q[j]);  // 交换
+    }
+
+    // 递归处理左右两部分
+    quick_sort(q, l, j);
+    quick_sort(q, j + 1, r);
+}
+
+// 重载：无需手动传边界，直接排序整个 vector
+void quick_sort(std::vector<int>& q) {
+    if (q.empty()) return;
+    quick_sort(q, 0, q.size() - 1);
+}
+```
+```c++
+#include <vector>
+#include <algorithm>  // 用于 swap
+
+// 直接操作 vector<int>，l=左边界，r=右边界（闭区间）
+void quick_sort(std::vector<int>& q, int l, int r) {
+    if (l >= r) return;
+
+    // 三点平均法计算 pivot：左(l)、中(mid)、右(r) 三个元素的平均值
+    int mid = (l + r) >> 1;  // 中间位置
+    int pivot = (q[l] + q[mid] + q[r]) / 3;  // 三点平均值作为基准
+
+    int i = l - 1, j = r + 1;
+    int x = pivot;  // 基准值改为三点平均值
+
+    while (i < j) {
+        do i++; while (q[i] < x);  // 找到 >=x 的元素
+        do j--; while (q[j] > x);  // 找到 <=x 的元素
+        if (i < j) std::swap(q[i], q[j]);  // 交换
+    }
+
+    // 递归处理左右两部分（仍用 j 分割，逻辑不变）
+    quick_sort(q, l, j);
+    quick_sort(q, j + 1, r);
+}
+
+// 重载：无需手动传边界，直接排序整个 vector
+void quick_sort(std::vector<int>& q) {
+    if (q.empty()) return;
+    quick_sort(q, 0, q.size() - 1);
+}
+```
+```c++
+#include <iostream>
+#include <vector>
+
+int main() {
+    // 测试极端有序数组（升序），三点平均法更高效
+    std::vector<int> q = {1,2,3,4,5,6,7,8,9};
+    quick_sort(q);
+
+    for (int x : q) std::cout << x << " ";  // 输出：1 2 3 4 5 6 7 8 9
+    return 0;
+}
+```
+
+
+2. 归并排序（对应 AcWing 787）
+
+```cpp
+#include <vector>
+
+// 辅助函数：合并两个有序区间 [l, mid] 和 [mid+1, r]
+void merge(std::vector<int>& q, int l, int mid, int r) {
+    std::vector<int> tmp;  // 临时存储合并结果
+    int i = l, j = mid + 1;
+
+    // 双指针合并
+    while (i <= mid && j <= r) {
+        if (q[i] <= q[j]) tmp.push_back(q[i++]);
+        else tmp.push_back(q[j++]);
+    }
+
+    // 处理剩余元素
+    while (i <= mid) tmp.push_back(q[i++]);
+    while (j <= r) tmp.push_back(q[j++]);
+
+    // 复制回原 vector
+    for (int k = 0; k < tmp.size(); k++) {
+        q[l + k] = tmp[k];
+    }
+}
+
+// 主函数：分治排序
+void merge_sort(std::vector<int>& q, int l, int r) {
+    if (l >= r) return;
+
+    int mid = (l + r) >> 1;
+    merge_sort(q, l, mid);     // 左半部分排序
+    merge_sort(q, mid + 1, r); // 右半部分排序
+    merge(q, l, mid, r);       // 合并两个有序区间
+}
+
+// 重载：直接排序整个 vector
+void merge_sort(std::vector<int>& q) {
+    if (q.empty()) return;
+    merge_sort(q, 0, q.size() - 1);
+}
+```
+
+C++ 使用示例
+
+```cpp
+#include <iostream>
+#include <vector>
+
+int main() {
+    // 快速排序示例
+    std::vector<int> q1 = {3, 1, 4, 1, 5, 9, 2, 6};
+    quick_sort(q1);  // 直接调用，无需传边界
+    for (int x : q1) std::cout << x << " ";  // 输出：1 1 2 3 4 5 6 9
+    std::cout << std::endl;
+
+    // 归并排序示例
+    std::vector<int> q2 = {7, 5, 3, 2, 4, 6, 8, 1};
+    merge_sort(q2);  // 直接调用，无需传边界
+    for (int x : q2) std::cout << x << " ";  // 输出：1 2 3 4 5 6 7 8
+    return 0;
+}
+```
+
+
+
+
+
+Python 实现（贴近原逻辑，简洁高效）
+
+Python 版本保留了原算法的核心思想（双指针分区、分治合并），适配 Python 的列表（`list`），并优化了边界处理（避免索引越界）。
+
+1. 快速排序（对应 AcWing 785）
+
+```python
+def quick_sort(q, l=None, r=None):
+    # 首次调用时默认处理整个列表（l=0, r=len(q)-1）
+    if l is None:
+        l = 0
+    if r is None:
+        r = len(q) - 1
+    
+    if l >= r:
+        return
+    
+    # 取中间元素作为基准（避免极端情况）
+    i, j = l - 1, r + 1
+    x = q[(l + r) // 2]  # 整数除法，等价于 C++ 的 l + r >> 1
+
+    while i < j:
+        # 找到 >=x 的元素（循环条件与 C++ 一致）
+        i += 1
+        while q[i] < x:
+            i += 1
+        # 找到 <=x 的元素
+        j -= 1
+        while q[j] > x:
+            j -= 1
+        # 交换元素
+        if i < j:
+            q[i], q[j] = q[j], q[i]
+    
+    # 递归处理左右两部分（用 j 分割，与 C++ 逻辑一致）
+    quick_sort(q, l, j)
+    quick_sort(q, j + 1, r)
+```
+
+2. 归并排序（对应 AcWing 787）
+
+```python
+def merge_sort(q):
+    # 递归终止条件：列表长度 <=1 时已有序
+    if len(q) <= 1:
+        return q
+    
+    # 分割数组（中间位置）
+    mid = len(q) // 2
+    left = merge_sort(q[:mid])  # 左半部分排序
+    right = merge_sort(q[mid:])  # 右半部分排序
+    
+    # 双指针合并
+    res = []
+    i = j = 0
+    while i < len(left) and j < len(right):
+        if left[i] <= right[j]:
+            res.append(left[i])
+            i += 1
+        else:
+            res.append(right[j])
+            j += 1
+    
+    # 拼接剩余元素
+    res.extend(left[i:])
+    res.extend(right[j:])
+    return res
+```
+
+Python 使用示例
+
+```python
+# 快速排序示例（原地修改列表）
+arr1 = [3, 1, 4, 1, 5, 9, 2, 6]
+quick_sort(arr1)
+print(arr1)  # 输出：[1, 1, 2, 3, 4, 5, 6, 9]
+
+# 归并排序示例（返回新列表，不修改原列表）
+arr2 = [2.1, 5.3, 1.2, 4.0]
+sorted_arr2 = merge_sort(arr2)
+print(sorted_arr2)  # 输出：[1.2, 2.1, 4.0, 5.3]
+
+# 字符串列表排序（支持任意可比较类型）
+arr3 = ["apple", "banana", "cherry", "date"]
+quick_sort(arr3)
+print(arr3)  # 输出：['apple', 'banana', 'cherry', 'date']
+```
+
+1. **逻辑一致性**：所有版本严格遵循原 C 语言模板的核心逻辑（快速排序的双指针分区、归并排序的分治合并），确保排序结果和效率一致。
+2. **兼容性**：C++ 支持数组和 `vector`，Python 支持列表（`list`），且均支持任意可比较类型（整数、浮点数、字符串等）。
+3. **边界处理**：快速排序用中间元素作为基准（避免极端情况导致的超时），归并排序用局部临时数组（C++）或切片（Python）避免全局变量问题。
+4. **易用性**：C++ 提供重载函数适配 `vector`，Python 支持默认参数（无需手动传入边界），使用更简洁。
+
+
 ## 前缀和
+
 前缀和 有两种形式
 
 404 · 子数组求和 II
