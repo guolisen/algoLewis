@@ -552,6 +552,7 @@ if input_username in valid_users:
 - 支持高效的成员检测和集合运算
 
 ## 字符串
+
 ```
 s = "abc"
 sl = list(s)
@@ -1570,3 +1571,50 @@ print(envelopes)  # 输出：[[2, 3], [5, 4], [6, 4], [6, 7]]
     - 对比二维排序，少了「第二个值降序」的约束，这也是信封问题中需要加 `-x[1]` 的原因（避免宽相同的信封按高升序排列，影响后续最长递增子序列的计算）。
 
 简单记：`key` 返回什么，就按什么排 —— 返回单个值则一维排序，返回元组则逐维度升序排序；想要某一维降序，就对该维度取反（如 `-x[1]`）。
+
+
+
+
+
+# **负数索引**
+
+在Python中，负数索引表示**从右向左计数**：
+
+python
+
+```
+s = "Python"
+# 正索引：0  1  2  3  4  5
+#         P  y  t  h  o  n
+# 负索引：-6 -5 -4 -3 -2 -1
+
+print(s[-1])   # "n"   最后一个字符
+print(s[-2])   # "o"   倒数第二个字符
+print(s[-3])   # "h"   倒数第三个字符
+```
+
+
+
+### **`res[-m:]` 具体含义**
+
+python
+
+```
+res = "HelloWorld"
+m = 3
+
+# res[-3:] 表示：从倒数第3个字符开始，到字符串结束
+print(res[-3:])  # "rld"
+```
+
+```
+s = "PythonProgramming"
+
+# 各种切片方式
+print(s[:])           # "PythonProgramming" - 完整复制
+print(s[3:])          # "honProgramming" - 从索引3开始
+print(s[-5:])         # "mming" - 最后5个字符
+print(s[:-3])         # "PythonProgram" - 除了最后3个字符
+print(s[-8:-3])       # "ogram" - 从倒数第8到倒数第3（不含）
+print(s[2:-4])        # "thonProgra" - 组合使用
+```
