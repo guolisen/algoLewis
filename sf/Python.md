@@ -1618,3 +1618,42 @@ print(s[:-3])         # "PythonProgram" - 除了最后3个字符
 print(s[-8:-3])       # "ogram" - 从倒数第8到倒数第3（不含）
 print(s[2:-4])        # "thonProgra" - 组合使用
 ```
+
+
+
+# Python 装饰器（@）详解
+
+你看到的 `@app.route()` 就是 Python 的**装饰器（Decorator）**，这是 Python 的一个非常强大和优雅的特性。让我详细解释它的原理和用法。
+
+## **装饰器的本质**
+
+**装饰器本质上是一个函数**，它接收一个函数作为参数，并返回一个新的函数。`@` 符号是 Python 的**语法糖**，让装饰器的使用更加简洁。
+
+### **基本语法对比**
+
+python
+
+```
+# 1. 原始装饰器写法（理解原理）
+def my_decorator(func):
+    def wrapper():
+        print("Before function call")
+        func()
+        print("After function call")
+    return wrapper
+
+def say_hello():
+    print("Hello!")
+
+# 手动装饰
+say_hello = my_decorator(say_hello)
+say_hello()
+
+# 2. 使用 @ 语法糖（简洁写法）
+@my_decorator
+def say_hello():
+    print("Hello!")
+
+# 直接调用
+say_hello()
+```
