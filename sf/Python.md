@@ -1657,3 +1657,585 @@ def say_hello():
 # 直接调用
 say_hello()
 ```
+
+
+
+# Python `map()` 函数使用详解与示例
+
+## 一、`map()` 函数基础
+
+`map()` 函数的基本语法：
+
+python
+
+```
+map(function, iterable, ...)
+```
+
+
+
+- `function`：要对每个元素应用的函数
+- `iterable`：一个或多个可迭代对象
+- 返回：一个map对象（Python 3），需要转换为列表或其他可迭代对象查看
+
+## 二、基础示例
+
+### 示例1：基本的数字转换
+
+python
+
+```
+# 将字符串列表转换为整数列表
+str_numbers = ['1', '2', '3', '4', '5']
+int_numbers = list(map(int, str_numbers))
+print(int_numbers)  # [1, 2, 3, 4, 5]
+
+# 将整数列表转换为字符串列表
+int_list = [1, 2, 3, 4, 5]
+str_list = list(map(str, int_list))
+print(str_list)  # ['1', '2', '3', '4', '5']
+```
+
+
+
+### 示例2：数学运算
+
+python
+
+```
+# 对列表每个元素平方
+numbers = [1, 2, 3, 4, 5]
+squared = list(map(lambda x: x**2, numbers))
+print(squared)  # [1, 4, 9, 16, 25]
+
+# 对每个元素加10
+plus_ten = list(map(lambda x: x + 10, numbers))
+print(plus_ten)  # [11, 12, 13, 14, 15]
+```
+
+
+
+### 示例3：字符串处理
+
+python
+
+```
+# 将所有字符串转换为大写
+words = ['hello', 'world', 'python']
+uppercase = list(map(str.upper, words))
+print(uppercase)  # ['HELLO', 'WORLD', 'PYTHON']
+
+# 获取每个字符串的长度
+lengths = list(map(len, words))
+print(lengths)  # [5, 5, 6]
+
+# 去除字符串两端的空格
+strings = ['  hello  ', '  world  ', '  python  ']
+stripped = list(map(str.strip, strings))
+print(stripped)  # ['hello', 'world', 'python']
+```
+
+
+
+## 三、多参数映射（多个可迭代对象）
+
+### 示例4：多个列表对应元素相加
+
+python
+
+```
+list1 = [1, 2, 3]
+list2 = [4, 5, 6]
+list3 = [7, 8, 9]
+
+# 三个列表对应位置相加
+result = list(map(lambda x, y, z: x + y + z, list1, list2, list3))
+print(result)  # [12, 15, 18]
+
+# 使用普通函数
+def add_three(a, b, c):
+    return a + b + c
+
+result2 = list(map(add_three, list1, list2, list3))
+print(result2)  # [12, 15, 18]
+```
+
+
+
+### 示例5：创建坐标点
+
+python
+
+```
+x_coords = [1, 2, 3, 4]
+y_coords = [5, 6, 7, 8]
+
+points = list(map(lambda x, y: (x, y), x_coords, y_coords))
+print(points)  # [(1, 5), (2, 6), (3, 7), (4, 8)]
+```
+
+
+
+## 四、实用场景示例
+
+### 示例6：数据清洗和处理
+
+python
+
+```
+# 处理温度数据：将华氏度转换为摄氏度
+fahrenheit = [32, 68, 86, 104, 212]
+celsius = list(map(lambda f: (f - 32) * 5/9, fahrenheit))
+print(celsius)  # [0.0, 20.0, 30.0, 40.0, 100.0]
+
+# 四舍五入保留小数
+rounded = list(map(lambda c: round(c, 1), celsius))
+print(rounded)  # [0.0, 20.0, 30.0, 40.0, 100.0]
+```
+
+
+
+### 示例7：处理嵌套数据结构
+
+python
+
+```
+# 从字典列表中提取特定字段
+students = [
+    {'name': 'Alice', 'score': 85},
+    {'name': 'Bob', 'score': 92},
+    {'name': 'Charlie', 'score': 78}
+]
+
+# 提取所有分数
+scores = list(map(lambda student: student['score'], students))
+print(scores)  # [85, 92, 78]
+
+# 提取所有名字并大写
+names = list(map(lambda s: s['name'].upper(), students))
+print(names)  # ['ALICE', 'BOB', 'CHARLIE']
+```
+
+
+
+### 示例8：文件处理
+
+python
+
+```
+# 读取文件并处理每一行
+lines = ['  line1  \n', 'line2\n', '  line3  \n']
+
+# 去除空格和换行符
+clean_lines = list(map(str.strip, lines))
+print(clean_lines)  # ['line1', 'line2', 'line3']
+
+# 给每行添加前缀
+prefixed = list(map(lambda line: f"prefix: {line}", clean_lines))
+print(prefixed)  # ['prefix: line1', 'prefix: line2', 'prefix: line3']
+```
+
+
+
+## 五、`map()` 与自定义函数结合
+
+### 示例9：使用自定义函数
+
+python
+
+```
+def process_student(student_info):
+    name, score, age = student_info
+    status = "Pass" if score >= 60 else "Fail"
+    return f"{name}({age}): {score} - {status}"
+
+students_data = [
+    ("Alice", 85, 20),
+    ("Bob", 55, 21),
+    ("Charlie", 92, 19)
+]
+
+processed = list(map(process_student, students_data))
+print(processed)
+# 输出：
+# ['Alice(20): 85 - Pass', 'Bob(21): 55 - Fail', 'Charlie(19): 92 - Pass']
+```
+
+
+
+### 示例10：工厂函数创建
+
+python
+
+```
+def make_multiplier(factor):
+    def multiplier(x):
+        return x * factor
+    return multiplier
+
+# 创建不同的乘数函数
+double = make_multiplier(2)
+triple = make_multiplier(3)
+
+numbers = [1, 2, 3, 4, 5]
+
+# 使用map应用这些函数
+doubled = list(map(double, numbers))
+tripled = list(map(triple, numbers))
+
+print(doubled)  # [2, 4, 6, 8, 10]
+print(tripled)  # [3, 6, 9, 12, 15]
+```
+
+
+
+## 六、`map()` 与列表推导式的对比
+
+### 示例11：相同功能的两种写法
+
+python
+
+```
+numbers = [1, 2, 3, 4, 5]
+
+# 使用map
+result_map = list(map(lambda x: x * 2, numbers))
+
+# 使用列表推导式
+result_lc = [x * 2 for x in numbers]
+
+print(result_map)  # [2, 4, 6, 8, 10]
+print(result_lc)   # [2, 4, 6, 8, 10]
+```
+
+
+
+### 示例12：带条件的转换
+
+python
+
+```
+numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+# 使用map（需要结合filter或条件函数）
+def process_number(x):
+    return x * 2 if x % 2 == 0 else x
+
+result_map = list(map(process_number, numbers))
+
+# 使用列表推导式
+result_lc = [x * 2 if x % 2 == 0 else x for x in numbers]
+
+print(result_map)  # [1, 4, 3, 8, 5, 12, 7, 16, 9]
+print(result_lc)   # [1, 4, 3, 8, 5, 12, 7, 16, 9]
+```
+
+
+
+## 七、高级用法
+
+### 示例13：链式映射
+
+python
+
+```
+# 多个转换操作链式执行
+numbers = [1, 2, 3, 4, 5]
+
+# 链式转换：平方 → 加10 → 转字符串
+result = list(map(
+    str,
+    map(lambda x: x + 10,
+        map(lambda x: x ** 2, numbers)
+    )
+))
+print(result)  # ['11', '14', '19', '26', '35']
+
+# 等价于：
+def pipeline(x):
+    squared = x ** 2
+    plus_ten = squared + 10
+    return str(plus_ten)
+
+result2 = list(map(pipeline, numbers))
+print(result2)  # ['11', '14', '19', '26', '35']
+```
+
+
+
+### 示例14：部分函数应用
+
+python
+
+```
+from functools import partial
+
+def power(base, exponent):
+    return base ** exponent
+
+# 创建平方函数
+square = partial(power, exponent=2)
+# 创建立方函数
+cube = partial(power, exponent=3)
+
+numbers = [1, 2, 3, 4, 5]
+
+squares = list(map(square, numbers))
+cubes = list(map(cube, numbers))
+
+print(squares)  # [1, 4, 9, 16, 25]
+print(cubes)    # [1, 8, 27, 64, 125]
+```
+
+
+
+## 八、注意事项
+
+### 1. **惰性求值**
+
+python
+
+```
+# map返回的是迭代器，不是列表
+numbers = [1, 2, 3, 4]
+mapped = map(lambda x: x * 2, numbers)
+print(mapped)        # <map object at 0x...>
+print(list(mapped))  # [2, 4, 6, 8]
+
+# 只能迭代一次
+print(list(mapped))  # []  ⚠️ 第二次就是空的
+```
+
+
+
+
+
+# Random
+
+## **random 模块**（最常用）
+
+内置模块，适合一般随机需求。
+
+### 基础用法
+
+```
+import random
+
+# 生成随机浮点数 [0.0, 1.0)
+print(random.random())
+
+# 生成指定范围浮点数 [a, b]
+print(random.uniform(1.0, 10.0))
+
+# 生成随机整数 [a, b]
+print(random.randint(1, 100))
+
+# 从序列中随机选择
+colors = ['red', 'green', 'blue']
+print(random.choice(colors))  # 选一个
+print(random.choices(colors, k=2))  # 选多个（可重复）
+print(random.sample(colors, 2))  # 选多个（不重复）
+
+# 打乱序列（原地修改）
+cards = ['A', 'K', 'Q', 'J']
+random.shuffle(cards)
+print(cards)
+```
+
+
+
+### 高级用法
+
+```
+# 设置随机种子（保证结果可复现）
+random.seed(42)
+print(random.random())  # 每次运行结果相同
+
+# 正态分布随机数
+print(random.normalvariate(0, 1))  # 均值0，标准差1
+
+# 高斯分布
+print(random.gauss(0, 1))
+
+# 其他分布
+print(random.expovariate(1.0))  # 指数分布
+print(random.betavariate(alpha=0.5, beta=0.5))  # Beta分布
+```
+
+
+
+# zip
+
+
+
+`zip()` 是 Python 中非常实用的内置函数，用于**将多个可迭代对象中对应的元素打包成元组**。让我详细讲解它的用法：
+
+## 一、基本用法
+
+### **1. 基本语法**
+
+python
+
+```
+zip(*iterables)
+# *iterables: 一个或多个可迭代对象（列表、元组、字符串等）
+```
+
+
+
+### **2. 简单示例**
+
+python
+
+```
+# 两个列表打包
+names = ['Alice', 'Bob', 'Charlie']
+ages = [25, 30, 35]
+
+zipped = zip(names, ages)
+print(list(zipped))
+# 输出: [('Alice', 25), ('Bob', 30), ('Charlie', 35)]
+
+# 三个列表打包
+scores = [85, 92, 88]
+zipped = zip(names, ages, scores)
+print(list(zipped))
+# 输出: [('Alice', 25, 85), ('Bob', 30, 92), ('Charlie', 35, 88)]
+```
+
+
+
+## 二、关键特性
+
+### **1. 长度不一致时的处理**
+
+python
+
+```
+list1 = [1, 2, 3]
+list2 = ['a', 'b']  # 更短
+list3 = ['x', 'y', 'z', 'w']  # 更长
+
+result = list(zip(list1, list2, list3))
+print(result)
+# 输出: [(1, 'a', 'x'), (2, 'b', 'y')]
+# 以最短的list2为准，只打包前2个元素
+```
+
+
+
+# list 删除
+
+### 一、Python 列表删除元素的核心方法
+
+#### 1. `list.remove(x)` - 根据元素值删除
+
+- **功能**：删除列表中**第一个**出现的指定值 `x`。
+- **特点**：不需要知道元素索引，只需要值；如果值不存在，会抛出 `ValueError` 异常。
+- **示例**：
+
+```
+fruits = ['apple', 'banana', 'orange', 'banana']
+# 删除第一个出现的 'banana'
+fruits.remove('banana')
+print(fruits)  # 输出: ['apple', 'orange', 'banana']
+
+# 处理值不存在的情况（避免报错）
+if 'grape' in fruits:
+    fruits.remove('grape')
+else:
+    print("元素不存在")  # 输出: 元素不存在
+```
+
+#### 2. `del list[index]` / `del list[start:end]` - 根据索引 / 切片删除
+
+- **功能**：
+
+    - `del list[index]`：删除指定索引位置的元素；
+    - `del list[start:end]`：删除切片范围内的所有元素（支持步长，如 `del list[0:5:2]`）。
+
+    
+
+- **特点**：直接删除原列表，无返回值；索引越界会抛出 `IndexError` 异常。
+
+- **示例**：
+
+```
+nums = [1, 2, 3, 4, 5]
+# 删除索引为2的元素（值为3）
+del nums[2]
+print(nums)  # 输出: [1, 2, 4, 5]
+
+# 删除切片范围内的元素（索引1到3，左闭右开）
+del nums[1:3]
+print(nums)  # 输出: [1, 5]
+
+# 删除整个列表（慎用）
+# del nums  # 执行后nums变量会被销毁，再访问会报错
+```
+
+#### 3. `list.pop([index])` - 根据索引删除并返回元素
+
+- **功能**：删除指定索引的元素，并**返回该元素的值**；如果不指定索引，默认删除最后一个元素。
+- **特点**：可获取被删除的元素，适合需要用到删除值的场景；索引越界会抛出 `IndexError` 异常。
+- **示例**：
+
+```
+letters = ['a', 'b', 'c', 'd']
+# 删除索引1的元素，并获取值
+deleted = letters.pop(1)
+print(deleted)  # 输出: b
+print(letters)  # 输出: ['a', 'c', 'd']
+
+# 默认删除最后一个元素
+last = letters.pop()
+print(last)  # 输出: d
+print(letters)  # 输出: ['a', 'c']
+```
+
+#### 4. `list.clear()` - 清空所有元素
+
+- **功能**：删除列表中所有元素，保留空列表（区别于 `del list`，后者直接删除列表变量）。
+- **特点**：无返回值，原列表变为空列表。
+- **示例**：
+
+```
+colors = ['red', 'green', 'blue']
+colors.clear()
+print(colors)  # 输出: []
+```
+
+#### 5. 列表推导式 - 批量删除符合条件的元素
+
+- **功能**：通过筛选条件生成新列表，间接删除不符合条件的元素（推荐用于批量删除，效率更高）。
+- **特点**：不修改原列表，生成新列表；适合复杂条件的批量删除。
+- **示例**：
+
+```
+# 删除所有偶数
+nums = [1, 2, 3, 4, 5, 6]
+nums = [x for x in nums if x % 2 != 0]
+print(nums)  # 输出: [1, 3, 5]
+
+# 删除所有包含 'a' 的字符串
+words = ['apple', 'banana', 'cat', 'dog']
+words = [w for w in words if 'a' not in w]
+print(words)  # 输出: ['cat', 'dog']
+```
+
+### 二、各方法对比与适用场景
+
+|      方法      |       核心逻辑       |                适用场景                 |           注意事项           |
+| :------------: | :------------------: | :-------------------------------------: | :--------------------------: |
+|  `remove(x)`   | 按值删除第一个匹配项 |       知道元素值，只需删除第一个        |        值不存在会报错        |
+|     `del`      |  按索引 / 切片删除   |    知道元素索引，或批量删除连续元素     |        索引越界会报错        |
+| `pop([index])` |  按索引删除并返回值  |         需要获取被删除的元素值          |        索引越界会报错        |
+|   `clear()`    |     清空所有元素     |    需要保留空列表，而非删除列表变量     |    仅清空内容，变量仍存在    |
+|   列表推导式   |    筛选生成新列表    | 批量删除符合 / 不符合条件的元素（推荐） | 生成新列表，原列表需重新赋值 |
+
+### 总结
+
+1. **按值删**：用 `remove()`（删第一个）或列表推导式（批量删）；
+2. **按索引删**：用 `del`（仅删除）或 `pop()`（删除并返回值）；
+3. **清空列表**：用 `clear()`（保留列表）或 `del list`（删除变量）；
+4. **批量删**：优先用列表推导式（高效、简洁，避免循环删除导致的索引错乱）。
